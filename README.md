@@ -58,7 +58,7 @@ biotools-agent config
 | `OPENAI_API_KEY` | OpenAI API密钥 (必需) | - |
 | `OPENAI_BASE_URL` | API基础URL | `https://api.openai.com/v1` |
 | `OPENAI_MODEL` | 使用的模型名称 | `gpt-3.5-turbo` |
-| `GITHUB_TOKEN` | GitHub访问令牌 (可选) | - |
+| `HUB_TOKEN` | GitHub访问令牌 (可选) | - |
 
 ### 支持的AI服务
 

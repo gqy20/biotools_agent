@@ -164,9 +164,9 @@ def config(
     config_table.add_row("OPENAI_BASE_URL", config_manager.config.openai_base_url, "✅")
     config_table.add_row("OPENAI_MODEL", config_manager.config.openai_model, "✅")
     config_table.add_row(
-        "GITHUB_TOKEN", 
-        "***已设置***" if config_manager.config.github_token else "未设置",
-        "✅" if config_manager.config.github_token else "⚠️"
+        "HUB_TOKEN", 
+        "***已设置***" if config_manager.config.hub_token else "未设置",
+        "✅" if config_manager.config.hub_token else "⚠️"
     )
     config_table.add_row("TMP_DIR", config_manager.config.tmp_dir, "✅")
     config_table.add_row("OUTPUT_DIR", config_manager.config.output_dir, "✅")

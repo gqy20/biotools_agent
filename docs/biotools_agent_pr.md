@@ -252,7 +252,7 @@ biotools-agent analyze https://github.com/samtools/samtools
 OPENAI_API_KEY=your_modelscope_token
 OPENAI_BASE_URL=https://api-inference.modelscope.cn/v1
 OPENAI_MODEL=Qwen/Qwen3-235B-A22B-Instruct-2507
-GITHUB_TOKEN=your_github_token_optional
+HUB_TOKEN=your_github_token_optional
 ```
 
 ## 📊 项目指标

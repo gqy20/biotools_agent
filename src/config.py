@@ -17,7 +17,7 @@ class AppConfig(BaseModel):
     openai_model: str = Field(default="gpt-3.5-turbo", description="使用的模型名称")
     
     # GitHub配置
-    github_token: Optional[str] = Field(default=None, description="GitHub访问令牌")
+    hub_token: Optional[str] = Field(default=None, description="GitHub访问令牌")
     
     # 应用配置
     tmp_dir: str = Field(default="tmp", description="临时文件目录")
@@ -59,7 +59,7 @@ class ConfigManager:
             "openai_api_key": os.getenv("OPENAI_API_KEY"),
             "openai_base_url": os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1"),
             "openai_model": os.getenv("OPENAI_MODEL", "gpt-3.5-turbo"),
-            "github_token": os.getenv("GITHUB_TOKEN"),
+            "hub_token": os.getenv("HUB_TOKEN"),
             "tmp_dir": os.getenv("TMP_DIR", "tmp"),
             "output_dir": os.getenv("OUTPUT_DIR", "docs"),
             "max_file_size": int(os.getenv("MAX_FILE_SIZE", "10000")),
@@ -87,8 +87,8 @@ class ConfigManager:
             "User-Agent": "BioTools-Agent/1.0"
         }
         
-        if self.config.github_token:
-            headers["Authorization"] = f"token {self.config.github_token}"
+        if self.config.hub_token:
+            headers["Authorization"] = f"token {self.config.hub_token}"
             
         return headers
     

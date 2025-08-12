@@ -6,20 +6,35 @@ BioTools Agent 提供了两个 GitHub Actions 工作流，可以直接在 GitHub
 
 ## ⚙️ 环境配置
 
-### 必需的 Secrets
+### 必需的环境配置
 
-在使用工作流之前，需要在 GitHub 仓库中配置以下 Secrets：
+在使用工作流之前，需要在 GitHub 仓库中配置环境变量。工作流使用名为 `biotools` 的环境：
 
-1. 前往仓库的 `Settings` → `Secrets and variables` → `Actions`
-2. 点击 `New repository secret` 添加以下密钥：
+#### 步骤一：创建环境
+1. 前往仓库的 `Settings` → `Environments`
+2. 点击 `New environment`
+3. 环境名称输入：`biotools`
+4. 点击 `Configure environment`
 
-| Secret 名称 | 说明 | 示例值 |
+#### 步骤二：配置环境权限 (可选)
+- **Required reviewers**: 可以不设置，用于自动化运行
+- **Wait timer**: 设置为 0 分钟，避免不必要的等待
+- **Deployment branches**: 选择 `All branches` 或配置特定分支
+
+#### 步骤三：添加环境变量
+在 `biotools` 环境配置页面的 **Environment variables** 部分，添加以下变量：
+
+| 环境变量名称 | 说明 | 示例值 |
 |-------------|------|--------|
 | `OPENAI_API_KEY` | ModelScope API 密钥 | `ms-xxxxxxxxxxxxx` |
 | `OPENAI_BASE_URL` | API 基础地址 | `https://api-inference.modelscope.cn/v1` |
 | `OPENAI_MODEL` | 使用的模型名称 | `Qwen/Qwen3-235B-A22B-Instruct-2507` |
+| `HUB_TOKEN` | GitHub Personal Access Token (可选) | `ghp_xxxxxxxxxxxxx` |
 
-> 📝 **注意**: `GITHUB_TOKEN` 是 GitHub 自动提供的，无需手动配置。
+> 📝 **注意**: 
+> - 所有变量都配置在 `biotools` 环境中，而不是 repository secrets
+> - `HUB_TOKEN` 是可选的，用于提高 GitHub API 访问限制
+> - 环境配置提供了更好的安全性和管理便利性
 
 ## 🔧 工作流说明
 
@@ -124,9 +139,12 @@ biotools-analysis-{name}-{run_number}/
 
 ### 常见错误
 
-**1. 配置错误**
+**1. 环境配置错误**
 - 错误信息: `❌ 配置验证失败`
-- 解决方案: 检查 Secrets 配置是否正确
+- 解决方案: 
+  - 确认已创建名为 `biotools` 的环境
+  - 检查环境变量是否正确配置
+  - 验证 API 密钥格式是否正确
 
 **2. URL 格式错误**
 - 错误信息: `❌ 错误: 请提供有效的GitHub URL格式`
@@ -149,10 +167,12 @@ biotools-analysis-{name}-{run_number}/
 
 ## 🔐 安全说明
 
-- Secrets 中的敏感信息不会在日志中显示
-- API 密钥仅用于模型调用，不会被存储或传输
-- 分析结果通过 GitHub Artifacts 安全存储
-- 建议定期轮换 API 密钥
+- **环境变量保护**: `biotools` 环境中的敏感信息不会在日志中显示
+- **访问控制**: 环境配置可以限制哪些分支能够访问敏感变量
+- **审批流程**: 可以配置环境审批者，增加安全层级
+- **API 密钥安全**: 密钥仅用于模型调用，不会被存储或传输到其他地方
+- **结果安全**: 分析结果通过 GitHub Artifacts 安全存储和分发
+- **最佳实践**: 建议定期轮换 API 密钥并监控使用情况
 
 ## 📚 更多资源
 

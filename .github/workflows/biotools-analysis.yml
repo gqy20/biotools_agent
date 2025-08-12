@@ -22,11 +22,12 @@ env:
   OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
   OPENAI_BASE_URL: ${{ secrets.OPENAI_BASE_URL }}
   OPENAI_MODEL: ${{ secrets.OPENAI_MODEL }}
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  HUB_TOKEN: ${{ secrets.HUB_TOKEN }}
 
 jobs:
   analyze-biotools:
     runs-on: ubuntu-latest
+    environment: biotools
     
     steps:
     - name: 检出代码
