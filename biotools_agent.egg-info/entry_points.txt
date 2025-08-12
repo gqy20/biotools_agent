@@ -1,0 +1,2 @@
+[console_scripts]
+biotools-agent = src.main:app

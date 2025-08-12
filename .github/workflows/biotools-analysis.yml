@@ -1,0 +1,169 @@
+name: BioTools Analysis
+
+on:
+  workflow_dispatch:
+    inputs:
+      github_url:
+        description: 'GitHub项目URL (例如: https://github.com/user/repo)'
+        required: true
+        type: string
+      output_formats:
+        description: '输出格式 (html,md,json)'
+        required: false
+        default: 'html,md,json'
+        type: string
+      analysis_name:
+        description: '分析任务名称 (可选)'
+        required: false
+        default: 'biotools-analysis'
+        type: string
+
+env:
+  OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+  OPENAI_BASE_URL: ${{ secrets.OPENAI_BASE_URL }}
+  OPENAI_MODEL: ${{ secrets.OPENAI_MODEL }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  analyze-biotools:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v4
+    
+    - name: 设置Python环境
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'
+    
+    - name: 安装uv包管理器
+      run: |
+        curl -LsSf https://astral.sh/uv/install.sh | sh
+        echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+    
+    - name: 验证输入URL
+      run: |
+        if [[ ! "${{ github.event.inputs.github_url }}" =~ ^https://github\.com/.+/.+ ]]; then
+          echo "❌ 错误: 请提供有效的GitHub URL格式"
+          echo "   示例: https://github.com/username/repository"
+          exit 1
+        fi
+        echo "✅ URL格式验证通过: ${{ github.event.inputs.github_url }}"
+    
+    - name: 安装项目依赖
+      run: |
+        uv pip install --system -e .
+        echo "✅ 依赖安装完成"
+    
+    - name: 验证配置
+      run: |
+        biotools-agent config
+    
+    - name: 创建输出目录
+      run: |
+        mkdir -p analysis-results
+        echo "📁 创建输出目录: analysis-results"
+    
+    - name: 执行生物信息学工具分析
+      run: |
+        echo "🚀 开始分析项目: ${{ github.event.inputs.github_url }}"
+        echo "📊 输出格式: ${{ github.event.inputs.output_formats }}"
+        echo "🏷️ 任务名称: ${{ github.event.inputs.analysis_name }}"
+        
+        timeout 300 biotools-agent analyze \
+          "${{ github.event.inputs.github_url }}" \
+          --output analysis-results \
+          --formats "${{ github.event.inputs.output_formats }}" \
+        || {
+          echo "❌ 分析超时或失败"
+          echo "请检查项目URL是否有效，或联系管理员"
+          exit 1
+        }
+    
+    - name: 生成分析摘要
+      run: |
+        echo "📋 生成分析结果摘要..."
+        
+        # 提取项目名称
+        PROJECT_NAME=$(basename "${{ github.event.inputs.github_url }}")
+        echo "项目名称: $PROJECT_NAME"
+        
+        # 统计生成的文件
+        echo "## 📊 分析结果摘要" > analysis-results/SUMMARY.md
+        echo "" >> analysis-results/SUMMARY.md
+        echo "**分析项目**: ${{ github.event.inputs.github_url }}" >> analysis-results/SUMMARY.md
+        echo "**分析时间**: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> analysis-results/SUMMARY.md
+        echo "**任务名称**: ${{ github.event.inputs.analysis_name }}" >> analysis-results/SUMMARY.md
+        echo "**输出格式**: ${{ github.event.inputs.output_formats }}" >> analysis-results/SUMMARY.md
+        echo "" >> analysis-results/SUMMARY.md
+        echo "### 生成的文件" >> analysis-results/SUMMARY.md
+        echo "" >> analysis-results/SUMMARY.md
+        
+        find analysis-results -type f \( -name "*.html" -o -name "*.md" -o -name "*.json" \) | while read file; do
+          size=$(stat -c%s "$file" 2>/dev/null || echo "0")
+          echo "- 📄 \`$(basename "$file")\` (${size} bytes)" >> analysis-results/SUMMARY.md
+        done
+        
+        echo "" >> analysis-results/SUMMARY.md
+        echo "### 快速预览" >> analysis-results/SUMMARY.md
+        echo "" >> analysis-results/SUMMARY.md
+        
+        # 尝试提取项目基本信息
+        if ls analysis-results/*.json 1> /dev/null 2>&1; then
+          JSON_FILE=$(ls analysis-results/*.json | head -1)
+          if command -v jq >/dev/null 2>&1; then
+            echo "**项目语言**: $(jq -r '.repository.language // "未知"' "$JSON_FILE")" >> analysis-results/SUMMARY.md
+            echo "**Stars**: $(jq -r '.repository.stars // 0' "$JSON_FILE")" >> analysis-results/SUMMARY.md
+            echo "**主要用途**: $(jq -r '.functionality.main_purpose // "未说明"' "$JSON_FILE")" >> analysis-results/SUMMARY.md
+          fi
+        fi
+        
+        cat analysis-results/SUMMARY.md
+    
+    - name: 上传分析结果
+      uses: actions/upload-artifact@v4
+      with:
+        name: biotools-analysis-${{ github.event.inputs.analysis_name }}-${{ github.run_number }}
+        path: analysis-results/
+        retention-days: 30
+    
+    - name: 输出下载链接提示
+      run: |
+        echo "🎉 分析完成！"
+        echo ""
+        echo "📁 分析结果已保存为GitHub Artifacts"
+        echo "💾 文件保留期: 30天"
+        echo "🔗 下载地址: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        echo ""
+        echo "📋 分析摘要:"
+        cat analysis-results/SUMMARY.md | tail -n +8
+    
+    - name: 创建评论 (如果是PR触发)
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const artifactUrl = `https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}`;
+          const comment = `
+          ## 🧬 BioTools Analysis 完成
+          
+          **分析项目**: ${{ github.event.inputs.github_url }}
+          **任务名称**: ${{ github.event.inputs.analysis_name }}
+          
+          📁 [下载分析结果](${artifactUrl})
+          
+          生成的报告包含:
+          - 📄 HTML可视化报告
+          - 📝 Markdown文档
+          - 📊 结构化JSON数据
+          
+          报告有效期30天。
+          `;
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: comment
+          });

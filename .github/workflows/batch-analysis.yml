@@ -1,0 +1,123 @@
+name: Batch BioTools Analysis
+
+on:
+  workflow_dispatch:
+    inputs:
+      csv_content:
+        description: 'CSV格式的URL列表 (每行一个URL)'
+        required: true
+        type: string
+      analysis_name:
+        description: '批量分析任务名称'
+        required: false
+        default: 'batch-analysis'
+        type: string
+
+env:
+  OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+  OPENAI_BASE_URL: ${{ secrets.OPENAI_BASE_URL }}
+  OPENAI_MODEL: ${{ secrets.OPENAI_MODEL }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  batch-analyze:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v4
+    
+    - name: 设置Python环境
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'
+    
+    - name: 安装uv和依赖
+      run: |
+        curl -LsSf https://astral.sh/uv/install.sh | sh
+        echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+        uv pip install --system -e .
+    
+    - name: 准备URL列表
+      run: |
+        echo "📝 准备分析URL列表..."
+        echo "${{ github.event.inputs.csv_content }}" > urls.txt
+        
+        # 验证URL格式
+        while IFS= read -r url; do
+          if [[ -n "$url" && ! "$url" =~ ^https://github\.com/.+/.+ ]]; then
+            echo "❌ 无效URL: $url"
+            exit 1
+          fi
+        done < urls.txt
+        
+        echo "✅ URL列表验证通过"
+        cat urls.txt
+    
+    - name: 批量执行分析
+      run: |
+        mkdir -p batch-results
+        failed_urls=""
+        success_count=0
+        total_count=0
+        
+        while IFS= read -r url; do
+          if [[ -z "$url" ]]; then continue; fi
+          
+          total_count=$((total_count + 1))
+          project_name=$(basename "$url")
+          echo ""
+          echo "🔄 [$total_count] 分析项目: $project_name"
+          echo "🔗 URL: $url"
+          
+          if timeout 300 biotools-agent analyze "$url" --output "batch-results/$project_name" --formats "html,md,json"; then
+            echo "✅ [$total_count] $project_name 分析成功"
+            success_count=$((success_count + 1))
+          else
+            echo "❌ [$total_count] $project_name 分析失败"
+            failed_urls="$failed_urls\n- $url"
+          fi
+          
+          # 避免API限制，间隔15秒
+          if [[ $total_count -lt $(wc -l < urls.txt) ]]; then
+            echo "⏸️ 等待15秒避免API限制..."
+            sleep 15
+          fi
+        done < urls.txt
+        
+        # 生成批量分析报告
+        echo "# 📊 批量分析结果报告" > batch-results/BATCH_SUMMARY.md
+        echo "" >> batch-results/BATCH_SUMMARY.md
+        echo "**分析时间**: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> batch-results/BATCH_SUMMARY.md
+        echo "**任务名称**: ${{ github.event.inputs.analysis_name }}" >> batch-results/BATCH_SUMMARY.md
+        echo "**总项目数**: $total_count" >> batch-results/BATCH_SUMMARY.md
+        echo "**成功数量**: $success_count" >> batch-results/BATCH_SUMMARY.md
+        echo "**成功率**: $(( success_count * 100 / total_count ))%" >> batch-results/BATCH_SUMMARY.md
+        echo "" >> batch-results/BATCH_SUMMARY.md
+        
+        if [[ -n "$failed_urls" ]]; then
+          echo "## ❌ 失败的项目" >> batch-results/BATCH_SUMMARY.md
+          echo -e "$failed_urls" >> batch-results/BATCH_SUMMARY.md
+          echo "" >> batch-results/BATCH_SUMMARY.md
+        fi
+        
+        echo "## 📁 成功生成的报告" >> batch-results/BATCH_SUMMARY.md
+        find batch-results -name "*.html" | while read file; do
+          project=$(basename $(dirname "$file"))
+          echo "- 📄 [$project]($(basename "$file"))" >> batch-results/BATCH_SUMMARY.md
+        done
+        
+        cat batch-results/BATCH_SUMMARY.md
+    
+    - name: 上传批量分析结果
+      uses: actions/upload-artifact@v4
+      with:
+        name: batch-biotools-analysis-${{ github.event.inputs.analysis_name }}-${{ github.run_number }}
+        path: batch-results/
+        retention-days: 30
+    
+    - name: 输出结果摘要
+      run: |
+        echo "🎉 批量分析完成！"
+        echo "📁 结果已上传为Artifacts，保留30天"
+        echo "🔗 下载地址: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"

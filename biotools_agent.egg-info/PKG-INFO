@@ -1,0 +1,95 @@
+Metadata-Version: 2.4
+Name: biotools-agent
+Version: 0.1.0
+Summary: A tool to analyze bioinformatics GitHub repositories and generate visualized documentation
+Author-email: BioTools Agent <biotools@example.com>
+Keywords: bioinformatics,github,analysis,documentation
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Science/Research
+Classifier: Topic :: Scientific/Engineering :: Bio-Informatics
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.12
+Requires-Python: >=3.12
+Description-Content-Type: text/markdown
+Requires-Dist: requests>=2.31.0
+Requires-Dist: gitpython>=3.1.40
+Requires-Dist: openai>=1.0.0
+Requires-Dist: jinja2>=3.1.0
+Requires-Dist: markdown>=3.5.0
+Requires-Dist: beautifulsoup4>=4.12.0
+Requires-Dist: pydantic>=2.5.0
+Requires-Dist: typer>=0.9.0
+Requires-Dist: rich>=13.7.0
+Requires-Dist: python-dotenv>=1.0.0
+Provides-Extra: dev
+Requires-Dist: pytest>=7.4.0; extra == "dev"
+Requires-Dist: black>=23.0.0; extra == "dev"
+Requires-Dist: isort>=5.12.0; extra == "dev"
+Requires-Dist: flake8>=6.0.0; extra == "dev"
+
+# BioTools Agent
+
+一个自动化工具，用于分析生物信息学GitHub仓库并生成可视化文档。
+
+## 功能特性
+
+- 自动克隆GitHub生物信息学工具仓库
+- 智能分析项目基础信息、作者、相关文章
+- 提取功能描述和使用方法
+- 生成美观的可视化文档
+
+## 快速开始
+
+### 1. 安装依赖
+```bash
+uv pip install -e .
+```
+
+### 2. 配置环境
+复制配置模板并编辑：
+```bash
+cp env.example .env
+# 编辑.env文件，配置您的API密钥
+```
+
+### 3. 运行分析
+```bash
+# 基本使用
+biotools-agent analyze https://github.com/username/biotools-repo
+
+# 使用自定义配置文件
+biotools-agent analyze https://github.com/username/repo --env-file custom.env
+```
+
+## 配置说明
+
+项目支持通过环境变量或.env文件进行配置：
+
+| 配置项 | 说明 | 默认值 |
+|--------|------|--------|
+| `OPENAI_API_KEY` | OpenAI API密钥 (必需) | - |
+| `OPENAI_BASE_URL` | API基础URL | `https://api.openai.com/v1` |
+| `OPENAI_MODEL` | 使用的模型名称 | `gpt-3.5-turbo` |
+| `GITHUB_TOKEN` | GitHub访问令牌 (可选) | - |
+
+### 支持的AI服务
+
+- **OpenAI官方API**
+- **ModelScope API** (如千问模型)
+- **其他兼容OpenAI格式的API服务**
+
+## 项目结构
+
+```
+biotools_agent/
+├── src/                 # 源代码
+├── docs/               # 文档
+├── tests/              # 测试
+├── tmp/                # 临时文件
+└── pyproject.toml      # 项目配置
+```
+
+## 许可证
+
+MIT License
