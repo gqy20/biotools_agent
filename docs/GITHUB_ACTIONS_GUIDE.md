@@ -93,6 +93,7 @@ BioTools Agent 提供了两个 GitHub Actions 工作流，可以直接在 GitHub
 | `github_url` | string | ✅ | - | GitHub项目URL |
 | `output_formats` | string | ❌ | `html,md,json` | 输出格式，逗号分隔 |
 | `analysis_name` | string | ❌ | `biotools-analysis` | 任务名称 |
+| `user_message` | string | ❌ | `''` | 用户消息 (用于API调用) |
 
 ### 批量分析参数
 
@@ -100,6 +101,94 @@ BioTools Agent 提供了两个 GitHub Actions 工作流，可以直接在 GitHub
 |------|------|------|--------|------|
 | `csv_content` | string | ✅ | - | URL列表，每行一个 |
 | `analysis_name` | string | ❌ | `batch-analysis` | 批量任务名称 |
+| `user_message` | string | ❌ | `''` | 用户消息 (用于API调用) |
+
+## 🔌 API 调用
+
+### 通过 GitHub API 触发工作流
+
+除了手动触发外，您还可以通过 GitHub API 或其他项目调用这些工作流：
+
+#### API 调用示例 (单项目分析)
+
+```bash
+curl -X POST \
+  -H "Accept: application/vnd.github.v3+json" \
+  -H "Authorization: token YOUR_GITHUB_TOKEN" \
+  https://api.github.com/repos/YOUR_USERNAME/biotools_agent/actions/workflows/biotools-analysis.yml/dispatches \
+  -d '{
+    "ref": "main",
+    "inputs": {
+      "github_url": "https://github.com/c-zhou/yahs",
+      "analysis_name": "api-test",
+      "user_message": "API调用测试分析"
+    }
+  }'
+```
+
+#### API 调用示例 (批量分析)
+
+```bash
+curl -X POST \
+  -H "Accept: application/vnd.github.v3+json" \
+  -H "Authorization: token YOUR_GITHUB_TOKEN" \
+  https://api.github.com/repos/YOUR_USERNAME/biotools_agent/actions/workflows/batch-analysis.yml/dispatches \
+  -d '{
+    "ref": "main",
+    "inputs": {
+      "csv_content": "https://github.com/c-zhou/yahs\nhttps://github.com/CSU-KangHu/HiTE",
+      "analysis_name": "batch-api-test",
+      "user_message": "批量API调用测试"
+    }
+  }'
+```
+
+#### 参数说明
+
+- **`ref`**: 要运行工作流的分支，通常是 `main`
+- **`inputs`**: 工作流输入参数
+  - `user_message`: 可选参数，用于标识API调用来源或传递额外信息
+  - 其他参数与手动触发时相同
+
+#### 权限要求
+
+调用 API 需要具有 `actions:write` 权限的 GitHub Personal Access Token。
+
+### 获取执行结果
+
+GitHub Actions 是异步执行的，无法在 API 调用时直接返回结果。可以通过以下方式获取执行状态和结果：
+
+#### 方法一：状态轮询
+
+```javascript
+// 轮询工作流状态
+async function checkWorkflowStatus(owner, repo, workflowFile) {
+  const response = await fetch(
+    `https://api.github.com/repos/${owner}/${repo}/actions/workflows/${workflowFile}/runs?per_page=5`,
+    {
+      headers: {
+        'Accept': 'application/vnd.github.v3+json',
+        'Authorization': `token ${GITHUB_TOKEN}`
+      }
+    }
+  );
+  
+  const data = await response.json();
+  return data.workflow_runs[0]; // 最新的运行
+}
+
+// 检查状态：queued, in_progress, completed
+// 检查结论：success, failure, cancelled
+```
+
+#### 方法二：Webhook 通知
+
+设置 Repository Webhook 接收工作流完成通知：
+- **Payload URL**: `https://your-api.com/webhook/github`
+- **Content type**: `application/json`
+- **Events**: 选择 `Workflow runs`
+
+详细的结果获取方法请参考：[结果反馈机制文档](./RESULT_FEEDBACK.md)
 
 ## 📁 结果下载
 

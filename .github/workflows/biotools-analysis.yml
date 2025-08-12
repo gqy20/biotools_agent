@@ -17,6 +17,11 @@ on:
         required: false
         default: 'biotools-analysis'
         type: string
+      user_message:
+        description: '用户消息 (用于API调用)'
+        required: false
+        default: ''
+        type: string
 
 env:
   OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -28,6 +33,12 @@ jobs:
   analyze-biotools:
     runs-on: ubuntu-latest
     environment: biotools
+    outputs:
+      success: ${{ steps.set-output.outputs.success }}
+      run_id: ${{ steps.set-output.outputs.run_id }}
+      run_url: ${{ steps.set-output.outputs.run_url }}
+      artifacts_url: ${{ steps.set-output.outputs.artifacts_url }}
+      project_name: ${{ steps.set-output.outputs.project_name }}
     
     steps:
     - name: 检出代码
@@ -71,6 +82,9 @@ jobs:
         echo "🚀 开始分析项目: ${{ github.event.inputs.github_url }}"
         echo "📊 输出格式: ${{ github.event.inputs.output_formats }}"
         echo "🏷️ 任务名称: ${{ github.event.inputs.analysis_name }}"
+        if [[ -n "${{ github.event.inputs.user_message }}" ]]; then
+          echo "💬 用户消息: ${{ github.event.inputs.user_message }}"
+        fi
         
         timeout 300 biotools-agent analyze \
           "${{ github.event.inputs.github_url }}" \
@@ -97,6 +111,9 @@ jobs:
         echo "**分析时间**: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> analysis-results/SUMMARY.md
         echo "**任务名称**: ${{ github.event.inputs.analysis_name }}" >> analysis-results/SUMMARY.md
         echo "**输出格式**: ${{ github.event.inputs.output_formats }}" >> analysis-results/SUMMARY.md
+        if [[ -n "${{ github.event.inputs.user_message }}" ]]; then
+          echo "**用户消息**: ${{ github.event.inputs.user_message }}" >> analysis-results/SUMMARY.md
+        fi
         echo "" >> analysis-results/SUMMARY.md
         echo "### 生成的文件" >> analysis-results/SUMMARY.md
         echo "" >> analysis-results/SUMMARY.md
@@ -129,7 +146,7 @@ jobs:
         path: analysis-results/
         retention-days: 30
     
-    - name: 输出下载链接提示
+    - name: 生成结构化结果输出
       run: |
         echo "🎉 分析完成！"
         echo ""
@@ -137,8 +154,41 @@ jobs:
         echo "💾 文件保留期: 30天"
         echo "🔗 下载地址: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
         echo ""
+        
+        # 生成机器可读的结果JSON
+        cat > analysis-results/RESULT.json << EOF
+        {
+          "success": true,
+          "run_id": "${{ github.run_id }}",
+          "run_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}",
+          "artifacts_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}",
+          "analysis_time": "$(date -u '+%Y-%m-%d %H:%M:%S UTC')",
+          "project_url": "${{ github.event.inputs.github_url }}",
+          "project_name": "$(basename "${{ github.event.inputs.github_url }}")",
+          "user_message": "${{ github.event.inputs.user_message }}",
+          "task_name": "${{ github.event.inputs.analysis_name }}",
+          "output_formats": "${{ github.event.inputs.output_formats }}",
+          "generated_files": [
+            $(find analysis-results -type f \( -name "*.html" -o -name "*.md" -o -name "*.json" \) | grep -v RESULT.json | while read file; do echo "\"$(basename "$file")\""; done | paste -sd,)
+          ]
+        }
+        EOF
+        
         echo "📋 分析摘要:"
         cat analysis-results/SUMMARY.md | tail -n +8
+        
+        echo ""
+        echo "📊 结构化结果:"
+        cat analysis-results/RESULT.json | jq .
+    
+    - name: 设置工作流输出
+      id: set-output
+      run: |
+        echo "success=true" >> $GITHUB_OUTPUT
+        echo "run_id=${{ github.run_id }}" >> $GITHUB_OUTPUT
+        echo "run_url=https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> $GITHUB_OUTPUT
+        echo "artifacts_url=https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> $GITHUB_OUTPUT
+        echo "project_name=$(basename "${{ github.event.inputs.github_url }}")" >> $GITHUB_OUTPUT
     
     - name: 创建评论 (如果是PR触发)
       if: github.event_name == 'pull_request'

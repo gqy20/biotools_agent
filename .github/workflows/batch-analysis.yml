@@ -12,6 +12,11 @@ on:
         required: false
         default: 'batch-analysis'
         type: string
+      user_message:
+        description: '用户消息 (用于API调用)'
+        required: false
+        default: ''
+        type: string
 
 env:
   OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -23,6 +28,12 @@ jobs:
   batch-analyze:
     runs-on: ubuntu-latest
     environment: biotools
+    outputs:
+      success: ${{ steps.set-output.outputs.success }}
+      run_id: ${{ steps.set-output.outputs.run_id }}
+      run_url: ${{ steps.set-output.outputs.run_url }}
+      total_count: ${{ steps.set-output.outputs.total_count }}
+      success_count: ${{ steps.set-output.outputs.success_count }}
     
     steps:
     - name: 检出代码
@@ -91,6 +102,9 @@ jobs:
         echo "" >> batch-results/BATCH_SUMMARY.md
         echo "**分析时间**: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> batch-results/BATCH_SUMMARY.md
         echo "**任务名称**: ${{ github.event.inputs.analysis_name }}" >> batch-results/BATCH_SUMMARY.md
+        if [[ -n "${{ github.event.inputs.user_message }}" ]]; then
+          echo "**用户消息**: ${{ github.event.inputs.user_message }}" >> batch-results/BATCH_SUMMARY.md
+        fi
         echo "**总项目数**: $total_count" >> batch-results/BATCH_SUMMARY.md
         echo "**成功数量**: $success_count" >> batch-results/BATCH_SUMMARY.md
         echo "**成功率**: $(( success_count * 100 / total_count ))%" >> batch-results/BATCH_SUMMARY.md
@@ -109,6 +123,10 @@ jobs:
         done
         
         cat batch-results/BATCH_SUMMARY.md
+        
+        # 保存统计数据供输出使用
+        echo "TOTAL_COUNT=$total_count" >> $GITHUB_ENV
+        echo "SUCCESS_COUNT=$success_count" >> $GITHUB_ENV
     
     - name: 上传批量分析结果
       uses: actions/upload-artifact@v4
@@ -117,8 +135,18 @@ jobs:
         path: batch-results/
         retention-days: 30
     
+    - name: 设置工作流输出
+      id: set-output
+      run: |
+        echo "success=true" >> $GITHUB_OUTPUT
+        echo "run_id=${{ github.run_id }}" >> $GITHUB_OUTPUT
+        echo "run_url=https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> $GITHUB_OUTPUT
+        echo "total_count=$TOTAL_COUNT" >> $GITHUB_OUTPUT
+        echo "success_count=$SUCCESS_COUNT" >> $GITHUB_OUTPUT
+    
     - name: 输出结果摘要
       run: |
         echo "🎉 批量分析完成！"
         echo "📁 结果已上传为Artifacts，保留30天"
         echo "🔗 下载地址: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        echo "📊 分析统计: 成功 $SUCCESS_COUNT/$TOTAL_COUNT 个项目"
