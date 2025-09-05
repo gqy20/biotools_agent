@@ -1,5 +1,15 @@
+# 数据库更新说明
+
+为了支持每次测试都有不同的项目ID，我们需要更新数据库表结构。
+
+## 更新步骤
+
+1. 登录到Supabase控制台
+2. 进入SQL Editor
+3. 执行以下SQL脚本:
+
+```sql
 -- SQL 语句：创建 bio_analysis_results 表
--- 文件路径: database/create_analysis_results_table.sql
 
 CREATE TABLE IF NOT EXISTS bio_analysis_results (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -26,3 +36,6 @@ FOR ALL TO service_role USING (true) WITH CHECK (true);
 
 -- 授予服务角色对表的权限
 GRANT ALL PRIVILEGES ON TABLE bio_analysis_results TO service_role;
+```
+
+4. 应用更改后，每次测试将生成唯一的test_id，允许对同一项目进行多次测试并保存所有结果。

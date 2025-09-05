@@ -2,6 +2,7 @@
 
 import os
 import json
+import uuid
 from typing import Optional
 from supabase import create_client, Client
 from .models import BioToolAnalysis
@@ -43,18 +44,22 @@ class SupabaseManager:
             if 'repository' in data_dict and 'url' in data_dict['repository']:
                 data_dict['repository']['url'] = str(data_dict['repository']['url'])
             
+            # 为每次测试生成唯一的test_id
+            test_id = str(uuid.uuid4())
+            
             # 准备插入的数据
             repo_url = str(analysis.repository.url)
             insert_data = {
+                "test_id": test_id,
                 "repo_url": repo_url,
                 "data": data_dict
             }
             
-            # 使用 upsert 操作，如果 repo_url 已存在则更新，否则插入
-            response = self.client.table("bio_analysis_results").upsert(insert_data).execute()
+            # 使用 insert 操作，确保每次测试都创建新记录
+            response = self.client.table("bio_analysis_results").insert(insert_data).execute()
             
             if response.data:
-                print(f"✅ 分析结果已保存到数据库: {repo_url}")
+                print(f"✅ 分析结果已保存到数据库: {repo_url} (测试ID: {test_id})")
                 return True
             else:
                 print(f"⚠️ 保存分析结果时未返回数据: {response.error.message if response.error else '未知错误'}")

@@ -3,3 +3,4 @@
 tmp/
 bio/
 QWEN.md
+src/__pycache__/

@@ -79,11 +79,17 @@ biotools-agent config
 ```
 bio_analysis_results (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    test_id UUID DEFAULT gen_random_uuid() NOT NULL,
     analysis_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    repo_url TEXT UNIQUE NOT NULL,
+    repo_url TEXT NOT NULL,
     data JSONB NOT NULL
 )
 ```
+
+**注意：** 为了支持对同一项目的多次测试，数据库表结构已更新，使用 `test_id` 作为每次测试的唯一标识符，
+而不是使用 `repo_url` 作为唯一键。这样可以保留同一项目的多次测试记录。
+
+更多信息请参考: [数据库更新说明](docs/DATABASE_UPDATE.md)
 
 ## 项目结构
 
