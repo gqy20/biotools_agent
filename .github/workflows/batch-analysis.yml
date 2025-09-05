@@ -23,6 +23,8 @@ env:
   OPENAI_BASE_URL: ${{ secrets.OPENAI_BASE_URL }}
   OPENAI_MODEL: ${{ secrets.OPENAI_MODEL }}
   HUB_TOKEN: ${{ secrets.HUB_TOKEN }}
+  SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+  SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
 
 jobs:
   batch-analyze:

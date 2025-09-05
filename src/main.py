@@ -15,6 +15,7 @@ from .config import config_manager
 from .github_analyzer import GitHubAnalyzer
 from .ai_analyzer import AIAnalyzer
 from .visualizer import DocumentVisualizer
+from .supabase_client import supabase_manager
 
 
 app = typer.Typer(
@@ -31,6 +32,7 @@ def analyze(
     output_dir: Optional[str] = typer.Option(None, "--output", "-o", help="输出目录"),
     env_file: Optional[str] = typer.Option(None, "--env-file", help=".env配置文件路径"),
     formats: str = typer.Option("html,md,json", "--formats", "-f", help="输出格式 (html,md,json)"),
+    save_to_db: bool = typer.Option(True, "--save-to-db/--no-save-to-db", "-s/-S", help="是否将结果保存到Supabase数据库 (默认: 保存)"),
 ):
     """分析GitHub生物信息学工具仓库"""
     
@@ -114,6 +116,10 @@ def analyze(
         # 显示结果摘要
         _display_analysis_summary(analysis, reports)
         
+        # 7. 保存到数据库 (如果启用)
+        if save_to_db:
+            _save_analysis_to_database(analysis)
+        
     except KeyboardInterrupt:
         console.print("\n[yellow]⚠️ 用户中断操作[/yellow]")
         raise typer.Exit(1)
@@ -168,6 +174,16 @@ def config(
         "***已设置***" if config_manager.config.hub_token else "未设置",
         "✅" if config_manager.config.hub_token else "⚠️"
     )
+    config_table.add_row(
+        "SUPABASE_URL", 
+        "***已设置***" if config_manager.config.supabase_url else "未设置",
+        "✅" if config_manager.config.supabase_url else "⚠️"
+    )
+    config_table.add_row(
+        "SUPABASE_KEY", 
+        "***已设置***" if config_manager.config.supabase_key else "未设置",
+        "✅" if config_manager.config.supabase_key else "⚠️"
+    )
     config_table.add_row("TMP_DIR", config_manager.config.tmp_dir, "✅")
     config_table.add_row("OUTPUT_DIR", config_manager.config.output_dir, "✅")
     
@@ -213,6 +229,24 @@ def _display_analysis_summary(analysis, reports):
         console.print(f"  • {format_name.upper()}: [cyan]{file_path}[/cyan]")
     
     console.print(f"\n[bold blue]✅ 分析完成![/bold blue]")
+
+
+def _save_analysis_to_database(analysis):
+    """将分析结果保存到Supabase数据库"""
+    console.print("\n[bold yellow]💾 正在保存分析结果到数据库...[/bold yellow]")
+    
+    # 检查Supabase是否已配置
+    if not supabase_manager.is_configured():
+        console.print("[red]❌ Supabase 未正确配置，无法保存结果。请检查 .env 文件中的 SUPABASE_URL 和 SUPABASE_KEY。[/red]")
+        return
+    
+    # 调用Supabase客户端保存数据
+    success = supabase_manager.save_analysis_result(analysis)
+    
+    if success:
+        console.print("[bold green]✅ 分析结果已成功保存到数据库![/bold green]")
+    else:
+        console.print("[red]❌ 保存分析结果到数据库失败。[/red]")
 
 
 if __name__ == "__main__":

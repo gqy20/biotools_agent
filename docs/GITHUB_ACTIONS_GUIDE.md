@@ -30,17 +30,20 @@ BioTools Agent 提供了两个 GitHub Actions 工作流，可以直接在 GitHub
 | `OPENAI_BASE_URL` | API 基础地址 | `https://api-inference.modelscope.cn/v1` |
 | `OPENAI_MODEL` | 使用的模型名称 | `Qwen/Qwen3-235B-A22B-Instruct-2507` |
 | `HUB_TOKEN` | GitHub Personal Access Token (可选) | `ghp_xxxxxxxxxxxxx` |
+| `SUPABASE_URL` | Supabase 项目 URL (可选，用于保存分析结果) | `https://your-project.supabase.co` |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase 服务角色密钥 (可选，用于保存分析结果) | `sb_secret_xxxxxxxxxx` |
 
 > 📝 **注意**: 
 > - 所有变量都配置在 `biotools` 环境中，而不是 repository secrets
 > - `HUB_TOKEN` 是可选的，用于提高 GitHub API 访问限制
+> - `SUPABASE_URL` 和 `SUPABASE_SERVICE_ROLE_KEY` 是可选的，用于将分析结果保存到 Supabase 数据库
 > - 环境配置提供了更好的安全性和管理便利性
 
 ## 🔧 工作流说明
 
 ### 1. 单项目分析 (`biotools-analysis.yml`)
 
-**功能**: 分析单个 GitHub 生物信息学工具项目
+**功能**: 分析单个 GitHub 生物信息学工具项目，默认将结果保存到 Supabase 数据库
 
 **触发方式**: 手动触发 (workflow_dispatch)
 
@@ -59,10 +62,11 @@ BioTools Agent 提供了两个 GitHub Actions 工作流，可以直接在 GitHub
 - Markdown 文档
 - JSON 结构化数据
 - 分析摘要文件
+- 自动保存到 Supabase 数据库（如果配置了 Supabase）
 
 ### 2. 批量分析 (`batch-analysis.yml`)
 
-**功能**: 批量分析多个项目
+**功能**: 批量分析多个项目，默认将结果保存到 Supabase 数据库
 
 **触发方式**: 手动触发 (workflow_dispatch)
 
@@ -83,6 +87,7 @@ BioTools Agent 提供了两个 GitHub Actions 工作流，可以直接在 GitHub
 - 每个项目的完整分析报告
 - 批量分析汇总报告
 - 成功率统计
+- 自动保存到 Supabase 数据库（如果配置了 Supabase）
 
 ## 📋 参数说明
 

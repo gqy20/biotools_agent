@@ -16,10 +16,10 @@
 **无需本地环境，直接在GitHub上运行分析！**
 
 1. Fork 本仓库到您的 GitHub 账号
-2. 在仓库 Settings → Secrets 中配置 API 密钥
+2. 在仓库 Settings → Environments 中配置 API 密钥和 Supabase 数据库配置
 3. 前往 Actions 页面，选择 "BioTools Analysis" 工作流
 4. 点击 "Run workflow"，输入要分析的 GitHub 项目 URL
-5. 等待分析完成，下载 Artifacts 中的报告文件
+5. 等待分析完成，下载 Artifacts 中的报告文件，分析结果也会自动保存到 Supabase 数据库
 
 详细说明请参考: [GitHub Actions 使用指南](docs/GITHUB_ACTIONS_GUIDE.md)
 
@@ -39,8 +39,11 @@ cp env.example .env
 
 #### 3. 运行分析
 ```bash
-# 基本使用
+# 基本使用（默认会保存到数据库）
 biotools-agent analyze https://github.com/username/biotools-repo
+
+# 禁用保存到数据库
+biotools-agent analyze https://github.com/username/biotools-repo --no-save-to-db
 
 # 使用自定义配置文件
 biotools-agent analyze https://github.com/username/repo --env-file custom.env
@@ -59,12 +62,28 @@ biotools-agent config
 | `OPENAI_BASE_URL` | API基础URL | `https://api.openai.com/v1` |
 | `OPENAI_MODEL` | 使用的模型名称 | `gpt-3.5-turbo` |
 | `HUB_TOKEN` | GitHub访问令牌 (可选) | - |
+| `SUPABASE_URL` | Supabase项目URL (可选，用于保存分析结果) | - |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase服务角色密钥 (可选，用于保存分析结果) | - |
 
 ### 支持的AI服务
 
 - **OpenAI官方API**
 - **ModelScope API** (如千问模型)
 - **其他兼容OpenAI格式的API服务**
+
+### 数据库导出功能
+
+分析结果默认会保存到 Supabase 数据库中。要启用此功能，需要配置 `SUPABASE_URL` 和 `SUPABASE_SERVICE_ROLE_KEY`。
+
+数据库表结构：
+```
+bio_analysis_results (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    analysis_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    repo_url TEXT UNIQUE NOT NULL,
+    data JSONB NOT NULL
+)
+```
 
 ## 项目结构
 

@@ -19,6 +19,10 @@ class AppConfig(BaseModel):
     # GitHub配置
     hub_token: Optional[str] = Field(default=None, description="GitHub访问令牌")
     
+    # Supabase配置
+    supabase_url: Optional[str] = Field(default=None, description="Supabase项目URL")
+    supabase_key: Optional[str] = Field(default=None, description="Supabase服务角色密钥")
+    
     # 应用配置
     tmp_dir: str = Field(default="tmp", description="临时文件目录")
     output_dir: str = Field(default="docs", description="输出目录")
@@ -60,6 +64,8 @@ class ConfigManager:
             "openai_base_url": os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1"),
             "openai_model": os.getenv("OPENAI_MODEL", "gpt-3.5-turbo"),
             "hub_token": os.getenv("HUB_TOKEN"),
+            "supabase_url": os.getenv("SUPABASE_URL"),
+            "supabase_key": os.getenv("SUPABASE_SERVICE_ROLE_KEY"),  # 使用服务角色密钥
             "tmp_dir": os.getenv("TMP_DIR", "tmp"),
             "output_dir": os.getenv("OUTPUT_DIR", "docs"),
             "max_file_size": int(os.getenv("MAX_FILE_SIZE", "10000")),
