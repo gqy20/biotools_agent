@@ -8,7 +8,7 @@ from typing import List, Dict, Any
 
 from .config import config_manager
 from .llm_client import LLMClient
-from .models import Publication, FunctionalityInfo, UsageInfo, BioToolAnalysis
+from .models import Publication, FunctionalityInfo, UsageInfo, BioToolAnalysis, CodeQualityInfo, PerformanceInfo, BioinformaticsExpertiseInfo, UsabilityInfo
 
 
 class AIAnalyzer:
@@ -47,6 +47,11 @@ class AIAnalyzer:
             publications=analysis_result["publications"],
             functionality=analysis_result["functionality"],
             usage=analysis_result["usage"],
+            architecture=analysis_result.get("architecture"),
+            code_quality=analysis_result.get("code_quality"),
+            performance=analysis_result.get("performance"),
+            bioinformatics_expertise=analysis_result.get("bioinformatics_expertise"),
+            usability=analysis_result.get("usability"),
             analysis_timestamp=datetime.now().isoformat()
         )
         
@@ -117,6 +122,32 @@ README内容：
         "basic_usage": "基本用法",
         "examples": ["示例1", "示例2"],
         "parameters": ["参数说明"]
+    }},
+    "code_quality": {{
+        "code_structure": "代码结构评价",
+        "documentation_quality": "文档质量评价",
+        "test_coverage": "测试覆盖度评价",
+        "code_style": "代码风格评价",
+        "best_practices": ["最佳实践1", "最佳实践2"]
+    }},
+    "performance": {{
+        "time_complexity": "时间复杂度描述",
+        "space_complexity": "空间复杂度描述",
+        "parallelization": "并行化支持描述",
+        "resource_usage": "资源使用情况",
+        "optimization_suggestions": ["优化建议1", "优化建议2"]
+    }},
+    "bioinformatics_expertise": {{
+        "algorithm_accuracy": "算法准确性评价",
+        "benchmark_results": "基准测试结果",
+        "tool_comparison": "与其他工具比较",
+        "applicable_scenarios": ["适用场景1", "适用场景2"]
+    }},
+    "usability": {{
+        "documentation_completeness": "文档完整性评价",
+        "user_interface": "用户界面评价",
+        "error_handling": "错误处理机制评价",
+        "learning_curve": "学习曲线评价"
     }}
 }}
 
@@ -125,6 +156,7 @@ README内容：
 2. 缺失信息用空数组[]或"未说明"
 3. 重点识别生物信息学格式(FASTA/BAM/VCF等)
 4. 确保有效JSON格式
+5. 对于新增的四个维度（代码质量、性能特征、生物信息学专业性、可用性），请根据README内容尽可能提供详细分析
 """
         
         try:
@@ -136,7 +168,7 @@ README内容：
             
             result = self.llm_client.sync_chat_completion(
                 messages=messages,
-                max_tokens=2000,
+                max_tokens=3000,
                 temperature=0.1,
                 timeout=60
             )
@@ -177,6 +209,44 @@ README内容：
                     parameters=usage_data.get("parameters", [])
                 )
                 
+                # 解析code_quality
+                code_quality_data = data.get("code_quality", {})
+                code_quality = CodeQualityInfo(
+                    code_structure=code_quality_data.get("code_structure", "未说明"),
+                    documentation_quality=code_quality_data.get("documentation_quality", "未说明"),
+                    test_coverage=code_quality_data.get("test_coverage", "未说明"),
+                    code_style=code_quality_data.get("code_style", "未说明"),
+                    best_practices=code_quality_data.get("best_practices", [])
+                )
+                
+                # 解析performance
+                performance_data = data.get("performance", {})
+                performance = PerformanceInfo(
+                    time_complexity=performance_data.get("time_complexity", "未说明"),
+                    space_complexity=performance_data.get("space_complexity", "未说明"),
+                    parallelization=performance_data.get("parallelization", "未说明"),
+                    resource_usage=performance_data.get("resource_usage", "未说明"),
+                    optimization_suggestions=performance_data.get("optimization_suggestions", [])
+                )
+                
+                # 解析bioinformatics_expertise
+                bioinformatics_data = data.get("bioinformatics_expertise", {})
+                bioinformatics_expertise = BioinformaticsExpertiseInfo(
+                    algorithm_accuracy=bioinformatics_data.get("algorithm_accuracy", "未说明"),
+                    benchmark_results=bioinformatics_data.get("benchmark_results", "未说明"),
+                    tool_comparison=bioinformatics_data.get("tool_comparison", "未说明"),
+                    applicable_scenarios=bioinformatics_data.get("applicable_scenarios", [])
+                )
+                
+                # 解析usability
+                usability_data = data.get("usability", {})
+                usability = UsabilityInfo(
+                    documentation_completeness=usability_data.get("documentation_completeness", "未说明"),
+                    user_interface=usability_data.get("user_interface", "未说明"),
+                    error_handling=usability_data.get("error_handling", "未说明"),
+                    learning_curve=usability_data.get("learning_curve", "未说明")
+                )
+                
                 print(f"✅ 成功解析所有信息")
                 print(f"  - 发表文章: {len(publications)} 篇")
                 print(f"  - 功能特性: {len(functionality.key_features)} 个")
@@ -185,7 +255,11 @@ README内容：
                 return {
                     "publications": publications,
                     "functionality": functionality,
-                    "usage": usage
+                    "usage": usage,
+                    "code_quality": code_quality,
+                    "performance": performance,
+                    "bioinformatics_expertise": bioinformatics_expertise,
+                    "usability": usability
                 }
             
         except Exception as e:
@@ -205,6 +279,10 @@ README内容：
             publications=default_data["publications"],
             functionality=default_data["functionality"],
             usage=default_data["usage"],
+            code_quality=default_data["code_quality"],
+            performance=default_data["performance"],
+            bioinformatics_expertise=default_data["bioinformatics_expertise"],
+            usability=default_data["usability"],
             analysis_timestamp=datetime.now().isoformat()
         )
     
@@ -224,6 +302,32 @@ README内容：
                 basic_usage="请查看项目文档获取使用方法",
                 examples=["请参考项目示例"],
                 parameters=["请查看帮助文档"]
+            ),
+            "code_quality": CodeQualityInfo(
+                code_structure="未说明",
+                documentation_quality="未说明",
+                test_coverage="未说明",
+                code_style="未说明",
+                best_practices=[]
+            ),
+            "performance": PerformanceInfo(
+                time_complexity="未说明",
+                space_complexity="未说明",
+                parallelization="未说明",
+                resource_usage="未说明",
+                optimization_suggestions=[]
+            ),
+            "bioinformatics_expertise": BioinformaticsExpertiseInfo(
+                algorithm_accuracy="未说明",
+                benchmark_results="未说明",
+                tool_comparison="未说明",
+                applicable_scenarios=[]
+            ),
+            "usability": UsabilityInfo(
+                documentation_completeness="未说明",
+                user_interface="未说明",
+                error_handling="未说明",
+                learning_curve="未说明"
             )
         }
     

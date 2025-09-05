@@ -66,6 +66,44 @@ class ProjectArchitecture(BaseModel):
     test_structure: Dict[str, str]
 
 
+class CodeQualityInfo(BaseModel):
+    """代码质量信息模型"""
+    
+    code_structure: str
+    documentation_quality: str
+    test_coverage: str
+    code_style: str
+    best_practices: List[str]
+
+
+class PerformanceInfo(BaseModel):
+    """性能特征信息模型"""
+    
+    time_complexity: str
+    space_complexity: str
+    parallelization: str
+    resource_usage: str
+    optimization_suggestions: List[str]
+
+
+class BioinformaticsExpertiseInfo(BaseModel):
+    """生物信息学专业性信息模型"""
+    
+    algorithm_accuracy: str
+    benchmark_results: str
+    tool_comparison: str
+    applicable_scenarios: List[str]
+
+
+class UsabilityInfo(BaseModel):
+    """可用性信息模型"""
+    
+    documentation_completeness: str
+    user_interface: str
+    error_handling: str
+    learning_curve: str
+
+
 class BioToolAnalysis(BaseModel):
     """完整的生物信息学工具分析结果"""
     
@@ -75,4 +113,8 @@ class BioToolAnalysis(BaseModel):
     functionality: FunctionalityInfo
     usage: UsageInfo
     architecture: Optional[ProjectArchitecture] = None
+    code_quality: Optional[CodeQualityInfo] = None
+    performance: Optional[PerformanceInfo] = None
+    bioinformatics_expertise: Optional[BioinformaticsExpertiseInfo] = None
+    usability: Optional[UsabilityInfo] = None
     analysis_timestamp: str

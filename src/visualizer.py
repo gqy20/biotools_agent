@@ -390,6 +390,133 @@ class DocumentVisualizer:
         </div>
         {% endif %}
 
+        <!-- 代码质量 -->
+        {% if analysis.code_quality %}
+        <div class="card">
+            <h2>💻 代码质量</h2>
+            
+            <div class="info-grid">
+                <div class="info-item">
+                    <strong>代码结构</strong>
+                    {{ analysis.code_quality.code_structure }}
+                </div>
+                <div class="info-item">
+                    <strong>文档质量</strong>
+                    {{ analysis.code_quality.documentation_quality }}
+                </div>
+                <div class="info-item">
+                    <strong>测试覆盖度</strong>
+                    {{ analysis.code_quality.test_coverage }}
+                </div>
+                <div class="info-item">
+                    <strong>代码风格</strong>
+                    {{ analysis.code_quality.code_style }}
+                </div>
+            </div>
+            
+            {% if analysis.code_quality.best_practices %}
+            <h3 style="margin-top: 25px; margin-bottom: 15px;">最佳实践</h3>
+            <ul class="feature-list">
+                {% for practice in analysis.code_quality.best_practices %}
+                <li>{{ practice }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- 性能特征 -->
+        {% if analysis.performance %}
+        <div class="card">
+            <h2>⚡ 性能特征</h2>
+            
+            <div class="info-grid">
+                <div class="info-item">
+                    <strong>时间复杂度</strong>
+                    {{ analysis.performance.time_complexity }}
+                </div>
+                <div class="info-item">
+                    <strong>空间复杂度</strong>
+                    {{ analysis.performance.space_complexity }}
+                </div>
+                <div class="info-item">
+                    <strong>并行化支持</strong>
+                    {{ analysis.performance.parallelization }}
+                </div>
+                <div class="info-item">
+                    <strong>资源使用</strong>
+                    {{ analysis.performance.resource_usage }}
+                </div>
+            </div>
+            
+            {% if analysis.performance.optimization_suggestions %}
+            <h3 style="margin-top: 25px; margin-bottom: 15px;">优化建议</h3>
+            <ul class="feature-list">
+                {% for suggestion in analysis.performance.optimization_suggestions %}
+                <li>{{ suggestion }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- 生物信息学专业性 -->
+        {% if analysis.bioinformatics_expertise %}
+        <div class="card">
+            <h2>🧬 生物信息学专业性</h2>
+            
+            <div class="info-grid">
+                <div class="info-item">
+                    <strong>算法准确性</strong>
+                    {{ analysis.bioinformatics_expertise.algorithm_accuracy }}
+                </div>
+                <div class="info-item">
+                    <strong>基准测试结果</strong>
+                    {{ analysis.bioinformatics_expertise.benchmark_results }}
+                </div>
+                <div class="info-item">
+                    <strong>工具比较</strong>
+                    {{ analysis.bioinformatics_expertise.tool_comparison }}
+                </div>
+            </div>
+            
+            {% if analysis.bioinformatics_expertise.applicable_scenarios %}
+            <h3 style="margin-top: 25px; margin-bottom: 15px;">适用场景</h3>
+            <ul class="feature-list">
+                {% for scenario in analysis.bioinformatics_expertise.applicable_scenarios %}
+                <li>{{ scenario }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- 可用性 -->
+        {% if analysis.usability %}
+        <div class="card">
+            <h2>👋 可用性</h2>
+            
+            <div class="info-grid">
+                <div class="info-item">
+                    <strong>文档完整性</strong>
+                    {{ analysis.usability.documentation_completeness }}
+                </div>
+                <div class="info-item">
+                    <strong>用户界面</strong>
+                    {{ analysis.usability.user_interface }}
+                </div>
+                <div class="info-item">
+                    <strong>错误处理</strong>
+                    {{ analysis.usability.error_handling }}
+                </div>
+                <div class="info-item">
+                    <strong>学习曲线</strong>
+                    {{ analysis.usability.learning_curve }}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
         <!-- 使用方法 -->
         <div class="card">
             <h2>💻 使用方法</h2>
@@ -524,6 +651,64 @@ class DocumentVisualizer:
 {% for path, purpose in analysis.architecture.directory_structure.items() %}
 - **{{ path }}**: {{ purpose }}
 {% endfor %}
+{% endif %}
+
+## 💻 代码质量
+
+{% if analysis.code_quality %}
+### 评估结果
+
+- **代码结构**: {{ analysis.code_quality.code_structure }}
+- **文档质量**: {{ analysis.code_quality.documentation_quality }}
+- **测试覆盖度**: {{ analysis.code_quality.test_coverage }}
+- **代码风格**: {{ analysis.code_quality.code_style }}
+
+### 最佳实践
+{% for practice in analysis.code_quality.best_practices %}
+- {{ practice }}
+{% endfor %}
+{% endif %}
+
+## ⚡ 性能特征
+
+{% if analysis.performance %}
+### 性能指标
+
+- **时间复杂度**: {{ analysis.performance.time_complexity }}
+- **空间复杂度**: {{ analysis.performance.space_complexity }}
+- **并行化支持**: {{ analysis.performance.parallelization }}
+- **资源使用**: {{ analysis.performance.resource_usage }}
+
+### 优化建议
+{% for suggestion in analysis.performance.optimization_suggestions %}
+- {{ suggestion }}
+{% endfor %}
+{% endif %}
+
+## 🧬 生物信息学专业性
+
+{% if analysis.bioinformatics_expertise %}
+### 专业评估
+
+- **算法准确性**: {{ analysis.bioinformatics_expertise.algorithm_accuracy }}
+- **基准测试结果**: {{ analysis.bioinformatics_expertise.benchmark_results }}
+- **工具比较**: {{ analysis.bioinformatics_expertise.tool_comparison }}
+
+### 适用场景
+{% for scenario in analysis.bioinformatics_expertise.applicable_scenarios %}
+- {{ scenario }}
+{% endfor %}
+{% endif %}
+
+## 👋 可用性
+
+{% if analysis.usability %}
+### 可用性评估
+
+- **文档完整性**: {{ analysis.usability.documentation_completeness }}
+- **用户界面**: {{ analysis.usability.user_interface }}
+- **错误处理**: {{ analysis.usability.error_handling }}
+- **学习曲线**: {{ analysis.usability.learning_curve }}
 {% endif %}
 
 ## 💻 使用方法

@@ -102,9 +102,10 @@ def analyze(
             
             # 6. AI分析
             task6 = progress.add_task("AI分析项目内容...", total=None)
-            analysis = ai_analyzer.analyze_repository_content(repo_path, repo_info, authors)
-            # 将架构信息添加到分析结果中
-            analysis.architecture = architecture
+            analysis_result = ai_analyzer.analyze_repository_content(repo_path, repo_info, authors)
+            # 将架构信息和其他AI分析结果添加到分析结果中
+            analysis_result.architecture = architecture
+            analysis = analysis_result
             progress.update(task6, completed=1)
             
             # 7. 生成报告
@@ -239,6 +240,31 @@ def _display_analysis_summary(analysis, reports):
             console.print(f"  [cyan]框架/库:[/cyan] {', '.join(analysis.architecture.frameworks)}")
         if analysis.architecture.entry_points:
             console.print(f"  [cyan]入口点:[/cyan] {', '.join(analysis.architecture.entry_points)}")
+    
+    # 代码质量信息
+    if analysis.code_quality:
+        console.print("\n[bold blue]💻 代码质量:[/bold blue]")
+        console.print(f"  [cyan]代码结构:[/cyan] {analysis.code_quality.code_structure}")
+        console.print(f"  [cyan]文档质量:[/cyan] {analysis.code_quality.documentation_quality}")
+    
+    # 性能特征信息
+    if analysis.performance:
+        console.print("\n[bold red]⚡ 性能特征:[/bold red]")
+        console.print(f"  [cyan]时间复杂度:[/cyan] {analysis.performance.time_complexity}")
+        console.print(f"  [cyan]并行化支持:[/cyan] {analysis.performance.parallelization}")
+    
+    # 生物信息学专业性信息
+    if analysis.bioinformatics_expertise:
+        console.print("\n[bold green]🧬 生物信息学专业性:[/bold green]")
+        console.print(f"  [cyan]算法准确性:[/cyan] {analysis.bioinformatics_expertise.algorithm_accuracy}")
+        if analysis.bioinformatics_expertise.applicable_scenarios:
+            console.print(f"  [cyan]适用场景:[/cyan] {', '.join(analysis.bioinformatics_expertise.applicable_scenarios[:3])}")
+    
+    # 可用性信息
+    if analysis.usability:
+        console.print("\n[bold yellow]👋 可用性:[/bold yellow]")
+        console.print(f"  [cyan]文档完整性:[/cyan] {analysis.usability.documentation_completeness}")
+        console.print(f"  [cyan]学习曲线:[/cyan] {analysis.usability.learning_curve}")
     
     # 生成的报告
     console.print(f"\n[bold green]📄 已生成报告:[/bold green]")
