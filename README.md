@@ -8,6 +8,8 @@
 - 智能分析项目基础信息、作者、相关文章
 - 提取功能描述和使用方法
 - 生成美观的可视化文档
+- **新增：项目架构分析** - 分析项目的编程语言、框架、目录结构等
+- **新增：全面的AI分析** - 包括代码质量、性能特征、生物信息学专业性和可用性分析
 
 ## 快速开始
 
@@ -89,6 +91,18 @@ bio_analysis_results (
 **注意：** 为了支持对同一项目的多次测试，数据库表结构已更新，使用 `test_id` 作为每次测试的唯一标识符，
 而不是使用 `repo_url` 作为唯一键。这样可以保留同一项目的多次测试记录。
 
+分析数据包含以下信息：
+- 仓库基础信息（名称、URL、描述、语言、Stars、Forks等）
+- 作者信息
+- 相关发表文章
+- 功能特性
+- 使用方法
+- 项目架构（编程语言、框架、目录结构等）
+- 代码质量评估
+- 性能特征分析
+- 生物信息学专业性评估
+- 可用性评估
+
 更多信息请参考: [数据库更新说明](docs/DATABASE_UPDATE.md)
 
 ## 项目结构
@@ -99,16 +113,19 @@ biotools_agent/
 │   ├── biotools-analysis.yml  # 单项目分析工作流
 │   └── batch-analysis.yml     # 批量分析工作流
 ├── src/                       # 源代码目录
-│   ├── ai_analyzer.py         # AI分析器
+│   ├── ai_analyzer.py         # AI分析器（新增：扩展的AI分析功能）
 │   ├── config.py              # 配置管理
-│   ├── github_analyzer.py     # GitHub仓库分析器
+│   ├── github_analyzer.py     # GitHub仓库分析器（新增：项目架构分析）
 │   ├── llm_client.py          # LLM客户端
 │   ├── main.py                # 主程序入口
-│   ├── models.py              # 数据模型
-│   └── visualizer.py          # 可视化报告生成器
+│   ├── models.py              # 数据模型（新增：扩展的数据模型）
+│   ├── supabase_client.py     # Supabase数据库客户端
+│   └── visualizer.py          # 可视化报告生成器（新增：扩展的可视化功能）
 ├── docs/                      # 文档目录
+│   ├── ARCHITECTURE_ANALYSIS_DESIGN.md  # 项目架构分析设计文档
+│   ├── DATABASE_UPDATE.md     # 数据库更新说明
 │   ├── GITHUB_ACTIONS_GUIDE.md  # GitHub Actions使用指南
-│   └── biotools_agent_pr.md     # 项目文档
+│   └── biotools_agent_pr.md   # 项目文档
 ├── tests/                     # 测试目录
 ├── test_results/              # 测试结果示例
 ├── data/                      # 测试数据
