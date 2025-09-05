@@ -1,7 +1,7 @@
 """数据模型定义"""
 
 from pydantic import BaseModel, HttpUrl
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 
 class RepositoryInfo(BaseModel):
@@ -54,6 +54,18 @@ class UsageInfo(BaseModel):
     parameters: List[str]
 
 
+class ProjectArchitecture(BaseModel):
+    """项目架构信息模型"""
+    
+    programming_languages: List[str]
+    frameworks: List[str]
+    directory_structure: Dict[str, str]
+    main_components: List[str]
+    entry_points: List[str]
+    config_files: List[str]
+    test_structure: Dict[str, str]
+
+
 class BioToolAnalysis(BaseModel):
     """完整的生物信息学工具分析结果"""
     
@@ -62,4 +74,5 @@ class BioToolAnalysis(BaseModel):
     publications: List[Publication]
     functionality: FunctionalityInfo
     usage: UsageInfo
+    architecture: Optional[ProjectArchitecture] = None
     analysis_timestamp: str

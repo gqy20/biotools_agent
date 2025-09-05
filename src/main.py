@@ -95,13 +95,20 @@ def analyze(
             authors = github_analyzer.extract_authors_from_repo(repo_path)
             progress.update(task4, completed=1)
             
-            # 5. AI分析
-            task5 = progress.add_task("AI分析项目内容...", total=None)
-            analysis = ai_analyzer.analyze_repository_content(repo_path, repo_info, authors)
+            # 5. 分析项目架构
+            task5 = progress.add_task("分析项目架构...", total=None)
+            architecture = github_analyzer.analyze_project_architecture(repo_path)
             progress.update(task5, completed=1)
             
-            # 6. 生成报告
-            task6 = progress.add_task("生成可视化报告...", total=None)
+            # 6. AI分析
+            task6 = progress.add_task("AI分析项目内容...", total=None)
+            analysis = ai_analyzer.analyze_repository_content(repo_path, repo_info, authors)
+            # 将架构信息添加到分析结果中
+            analysis.architecture = architecture
+            progress.update(task6, completed=1)
+            
+            # 7. 生成报告
+            task7 = progress.add_task("生成可视化报告...", total=None)
             reports = {}
             
             if "html" in output_formats:
@@ -111,7 +118,7 @@ def analyze(
             if "json" in output_formats:
                 reports["json"] = visualizer.generate_json_report(analysis)
             
-            progress.update(task6, completed=1)
+            progress.update(task7, completed=1)
         
         # 显示结果摘要
         _display_analysis_summary(analysis, reports)
@@ -222,6 +229,16 @@ def _display_analysis_summary(analysis, reports):
         console.print("\n[bold yellow]🔧 核心功能:[/bold yellow]")
         for feature in analysis.functionality.key_features[:5]:  # 显示前5个功能
             console.print(f"  • {feature}")
+    
+    # 项目架构信息
+    if analysis.architecture:
+        console.print("\n[bold magenta]🏗️ 项目架构:[/bold magenta]")
+        if analysis.architecture.programming_languages:
+            console.print(f"  [cyan]编程语言:[/cyan] {', '.join(analysis.architecture.programming_languages)}")
+        if analysis.architecture.frameworks:
+            console.print(f"  [cyan]框架/库:[/cyan] {', '.join(analysis.architecture.frameworks)}")
+        if analysis.architecture.entry_points:
+            console.print(f"  [cyan]入口点:[/cyan] {', '.join(analysis.architecture.entry_points)}")
     
     # 生成的报告
     console.print(f"\n[bold green]📄 已生成报告:[/bold green]")

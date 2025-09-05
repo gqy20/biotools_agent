@@ -342,6 +342,54 @@ class DocumentVisualizer:
             {% endif %}
         </div>
 
+        <!-- 项目架构 -->
+        {% if analysis.architecture %}
+        <div class="card">
+            <h2>🏗️ 项目架构</h2>
+            
+            {% if analysis.architecture.programming_languages %}
+            <div class="info-item">
+                <strong>编程语言</strong>
+                {% for lang in analysis.architecture.programming_languages %}
+                    <span class="tag">{{ lang }}</span>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            {% if analysis.architecture.frameworks %}
+            <div class="info-item" style="margin-top: 20px;">
+                <strong>框架/库</strong>
+                {% for framework in analysis.architecture.frameworks %}
+                    <span class="tag">{{ framework }}</span>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            {% if analysis.architecture.entry_points %}
+            <div class="info-item" style="margin-top: 20px;">
+                <strong>入口点</strong>
+                <ul class="feature-list">
+                    {% for entry in analysis.architecture.entry_points %}
+                    <li>{{ entry }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+            
+            {% if analysis.architecture.directory_structure %}
+            <h3 style="margin-top: 25px; margin-bottom: 15px;">目录结构</h3>
+            <div class="info-grid">
+                {% for path, purpose in analysis.architecture.directory_structure.items() %}
+                <div class="info-item">
+                    <strong>{{ path }}</strong>
+                    {{ purpose }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
         <!-- 使用方法 -->
         <div class="card">
             <h2>💻 使用方法</h2>
@@ -453,6 +501,30 @@ class DocumentVisualizer:
 {% for dep in analysis.functionality.dependencies %}
 - `{{ dep }}`
 {% endfor %}
+
+## 🏗️ 项目架构
+
+{% if analysis.architecture %}
+### 编程语言
+{% for lang in analysis.architecture.programming_languages %}
+- `{{ lang }}`
+{% endfor %}
+
+### 框架/库
+{% for framework in analysis.architecture.frameworks %}
+- `{{ framework }}`
+{% endfor %}
+
+### 入口点
+{% for entry in analysis.architecture.entry_points %}
+- {{ entry }}
+{% endfor %}
+
+### 目录结构
+{% for path, purpose in analysis.architecture.directory_structure.items() %}
+- **{{ path }}**: {{ purpose }}
+{% endfor %}
+{% endif %}
 
 ## 💻 使用方法
 
