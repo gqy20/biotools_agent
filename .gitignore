@@ -1,3 +1,5 @@
 .env
+.env_bak
 tmp/
 bio/
+QWEN.md

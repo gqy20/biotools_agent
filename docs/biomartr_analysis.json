@@ -1,0 +1,85 @@
+{
+  "repository": {
+    "name": "biomartr",
+    "url": "https://github.com/ropensci/biomartr",
+    "description": "Genomic Data Retrieval with R",
+    "language": "R",
+    "stars": 223,
+    "forks": 29,
+    "license": null
+  },
+  "authors": [
+    {
+      "name": "Hajk Drost (Staff)",
+      "email": "hajkdrost@googlemail.com",
+      "github_username": null
+    },
+    {
+      "name": "Hajk-Georg Drost",
+      "email": "HajkD@users.noreply.github.com",
+      "github_username": null
+    },
+    {
+      "name": "Roleren",
+      "email": "hauken_heyken@hotmail.com",
+      "github_username": null
+    },
+    {
+      "name": "Håkon Tjeldnes",
+      "email": "hauken_heyken@hotmail.com",
+      "github_username": null
+    },
+    {
+      "name": "HajkD",
+      "email": "hajkdrost@googlemail.com",
+      "github_username": null
+    }
+  ],
+  "publications": [
+    {
+      "title": "Biomartr: genomic data retrieval with R",
+      "authors": [
+        "Drost HG",
+        "Paszkowski J"
+      ],
+      "journal": "Bioinformatics",
+      "year": 2017,
+      "doi": "10.1093/bioinformatics/btw821",
+      "pmid": null
+    }
+  ],
+  "functionality": {
+    "main_purpose": "自动化基因组数据检索以支持大规模基因组分析，提高计算可重复性",
+    "key_features": [
+      "从NCBI RefSeq、Genbank、ENSEMBL等数据库检索基因组、蛋白质组、CDS、RNA、GFF/GTF等数据",
+      "支持整个数据库的下载（如NCBI nr、nt、Genbank等）",
+      "通过Ensembl Biomart接口进行功能注释检索"
+    ],
+    "input_formats": [
+      "未说明"
+    ],
+    "output_formats": [
+      "FASTA",
+      "GFF",
+      "GTF"
+    ],
+    "dependencies": [
+      "Biostrings",
+      "biomaRt"
+    ]
+  },
+  "usage": {
+    "installation": "从CRAN安装: install.packages(\"biomartr\"); 开发版安装: BiocManager::install(\"ropensci/biomartr\"); Bioconda安装: conda install r-biomartr",
+    "basic_usage": "使用getCollection()函数检索基因组及相关数据文件",
+    "examples": [
+      "getCollection(organism = \"Homo sapiens\", type = \"genome\", database = \"ensembl\")",
+      "getCollection(organism = \"Mus musculus\", type = \"proteome\", database = \"refseq\")"
+    ],
+    "parameters": [
+      "organism: 指定科学名称的生物体",
+      "type: 指定检索数据类型（如genome, proteome等）",
+      "database: 指定数据来源（如ensembl, refseq等）"
+    ]
+  },
+  "analysis_timestamp": "2025-09-05T11:07:19.839239"
+}

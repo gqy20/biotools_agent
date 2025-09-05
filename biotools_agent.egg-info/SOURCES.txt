@@ -10,7 +10,9 @@ src/__init__.py
 src/ai_analyzer.py
 src/config.py
 src/github_analyzer.py
+src/llm_client.py
 src/main.py
 src/models.py
+src/supabase_client.py
 src/visualizer.py
 tests/test_basic.py
