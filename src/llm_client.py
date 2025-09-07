@@ -108,9 +108,10 @@ class LLMClient:
                 
                 data = json.loads(json_content)
                 
-                # 验证数据质量
-                if self._contains_garbage_data(data):
-                    print("❌ 检测到垃圾数据，拒绝返回")
+                # 验证数据质量 - 只检查明显的垃圾内容
+                if self._contains_obvious_garbage(data):
+                    print("❌ 检测到明显垃圾数据，拒绝返回")
+                    print(f"🔍 调试信息 - JSON内容前500字符: {json_content[:500]}")
                     return None
                 
                 return data
@@ -122,51 +123,30 @@ class LLMClient:
             print(f"❌ JSON解析失败: {e}")
             return None
     
-    def _contains_garbage_data(self, data: Dict[str, Any]) -> bool:
-        """检测垃圾数据 - Linus风格: 严格标准"""
-        # 明确的垃圾字符串列表
-        garbage_strings = {
-            # 中文垃圾
-            "未说明", "未知", "无", "未定义", "暂无", "未明确列出", "未指定",
-            # 英文垃圾  
-            "Unknown", "N/A", "TBD", "Not specified", "Not mentioned", "Not available",
-            # 模板占位符
-            "文章标题", "作者", "期刊", "DOI", "主要用途一句话", "功能1", "功能2", "功能3",
-            "输入格式", "输出格式", "代码结构评价", "文档质量评价", "时间复杂度描述",
-            "并行化支持描述", "算法准确性评价", "适用场景1", "适用场景2", "文档完整性评价",
-            "学习曲线评价", "基于README分析", "参考README"
+    def _contains_obvious_garbage(self, data: Dict[str, Any]) -> bool:
+        """检测明显的垃圾数据 - Linus风格: 只拒绝真正的垃圾"""
+        # 只检测最明显的垃圾字符串
+        obvious_garbage = {
+            "Unknown", "N/A", "TBD", "Not specified", "Not available",
+            "未知", "无", "暂无", "未指定"
         }
         
-        def is_garbage(value) -> bool:
+        def is_obvious_garbage(value) -> bool:
             if isinstance(value, str):
                 stripped = value.strip()
-                # 空字符串或仅空白符
+                # 空字符串
                 if not stripped:
                     return True
-                # 明确的垃圾字符串
-                if stripped in garbage_strings:
-                    return True
-                # 包含垃圾模式的字符串
-                if any(garbage in stripped for garbage in ["未明确", "请参考", "基于README"]):
+                # 只检查最明显的垃圾
+                if stripped in obvious_garbage:
                     return True
                 return False
             elif isinstance(value, list):
-                return any(is_garbage(item) for item in value)
+                # 空列表不是垃圾，只检查内容
+                return any(is_obvious_garbage(item) for item in value)
             elif isinstance(value, dict):
-                return any(is_garbage(v) for v in value.values())
+                return any(is_obvious_garbage(v) for v in value.values())
             return False
         
-        # 特别检查publications中的垃圾作者信息
-        publications = data.get("publications", [])
-        for pub in publications:
-            if isinstance(pub, dict):
-                authors = pub.get("authors", [])
-                if authors and any(is_garbage(author) for author in authors):
-                    print(f"❌ 检测到垃圾作者信息: {authors}")
-                    return True
-        
-        # 递归检查所有数据
-        if is_garbage(data):
-            return True
-            
-        return False
+        # 只检查最关键的字段
+        return is_obvious_garbage(data.get("functionality", {}).get("main_purpose", ""))

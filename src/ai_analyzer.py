@@ -8,7 +8,7 @@ from typing import List, Dict, Any, Optional
 
 from .config import config_manager
 from .llm_client import LLMClient
-from .models import Publication, FunctionalityInfo, UsageInfo, BioToolAnalysis, CodeQualityInfo, PerformanceInfo, BioinformaticsExpertiseInfo, UsabilityInfo
+from .models import Publication, FunctionalityInfo, UsageInfo, BioToolAnalysis, CodeQualityInfo, PerformanceInfo, BioinformaticsExpertiseInfo, UsabilityInfo, DeploymentInfo, TestingInfo, DataRequirements
 
 
 class AIAnalyzer:
@@ -52,6 +52,9 @@ class AIAnalyzer:
             performance=analysis_result.get("performance"),
             bioinformatics_expertise=analysis_result.get("bioinformatics_expertise"),
             usability=analysis_result.get("usability"),
+            deployment=analysis_result.get("deployment"),           # 新增
+            testing=analysis_result.get("testing"),                 # 新增
+            data_requirements=analysis_result.get("data_requirements"),  # 新增
             analysis_timestamp=datetime.now().isoformat()
         )
         
@@ -94,21 +97,29 @@ class AIAnalyzer:
         return ""
     
     def _collect_core_code_samples(self, repo_path: Path) -> str:
-        """收集核心代码样本 - Linus风格：找到算法核心"""
+        """收集核心代码样本 - Linus风格：找到算法核心和部署文件"""
         print("🔍 收集核心代码样本...")
         
-        # 核心文件模式 - 生物信息学工具常见的核心文件
+        # 核心文件模式 - 算法文件 + 部署配置文件
         core_patterns = [
+            # 主程序文件
             "main.py", "main.cpp", "main.c", "main.java",
+            # 算法核心
             "*algorithm*", "*core*", "*engine*", 
             "*align*", "*search*", "*index*", "*parse*",
+            # 部署和配置文件
+            "Dockerfile", "docker-compose.yml", "*.dockerfile",
+            "environment.yml", "conda.yml", "requirements.txt",
+            "setup.py", "setup.cfg", "pyproject.toml",
+            "Makefile", "CMakeLists.txt",
+            "test_*.py", "*_test.py", "test*.sh",
             "*.py", "*.cpp", "*.c", "*.java", "*.R"
         ]
         
         code_samples = []
         file_count = 0
-        max_files = 5  # 限制文件数量
-        max_content = 2000  # 每个文件最大内容长度
+        max_files = 8  # 增加文件数量以包含更多部署信息
+        max_content = 1500  # 减少每个文件内容以腾出空间
         
         for pattern in core_patterns:
             if file_count >= max_files:
@@ -120,8 +131,8 @@ class AIAnalyzer:
                     if file_count >= max_files:
                         break
                         
-                    # 跳过不相关目录
-                    if any(skip in str(file_path) for skip in ['.git', '__pycache__', 'test', 'doc', 'example']):
+                    # 跳过不相关目录，但保留test目录（用于分析测试信息）
+                    if any(skip in str(file_path) for skip in ['.git', '__pycache__', 'doc', 'example']):
                         continue
                         
                     if file_path.is_file() and file_path.stat().st_size < 50000:  # 小于50KB
@@ -189,16 +200,39 @@ README内容：
         "algorithm_complexity": "基于代码分析的算法复杂度",
         "resource_requirements": "资源需求分析", 
         "optimization_features": "发现的优化特性"
+    },
+    "deployment": {
+        "installation_methods": ["conda", "pip", "docker"],  // 明确提到的安装方式
+        "system_requirements": ["Linux", "Python 3.8+"],    // 系统要求
+        "container_support": ["Docker", "Singularity"],      // 容器支持
+        "cloud_deployment": ["AWS", "Google Cloud"],         // 云部署选项
+        "configuration_files": ["config.yaml", ".env"]       // 配置文件
+    },
+    "testing": {
+        "test_commands": ["python -m pytest", "make test"],  // 测试命令
+        "test_data_sources": ["示例数据URL", "测试数据集"],    // 测试数据来源
+        "example_datasets": ["example.fasta", "demo.bam"],   // 示例数据
+        "validation_methods": ["基准比较", "已知结果验证"],     // 验证方法
+        "benchmark_datasets": ["标准数据集名称"]              // 基准数据集
+    },
+    "data_requirements": {
+        "required_inputs": ["基因组序列", "注释文件"],         // 必需输入
+        "optional_inputs": ["质量文件", "掩码文件"],           // 可选输入
+        "data_formats": ["FASTA", "GFF3", "BED"],           // 支持格式
+        "file_size_limits": "最大文件大小限制",               // 大小限制
+        "preprocessing_steps": ["质量过滤", "格式转换"]        // 预处理步骤
     }
 }
 
 严格要求：
 1. 所有文本必须使用中文表达
-2. 仅提取README中明确写明的信息
-3. 如果提供了代码，结合代码进行算法复杂度分析
+2. 仅提取README/代码中明确写明的信息
+3. 特别关注安装说明、测试示例、数据要求部分
 4. 如果信息缺失，直接省略该字段
 5. 绝不使用占位符或模板文本
-6. 返回简洁、事实性的中文JSON"""
+6. 对于部署信息，重点查找Docker、conda、pip等关键词
+7. 对于测试信息，查找test、example、demo等相关内容
+8. 返回简洁、实用的中文JSON"""
 
         return prompt
 
@@ -279,11 +313,50 @@ README内容：
                 optimization_suggestions=[]
             )
         
+        # 部署信息 - Linus风格：实用为主
+        deployment_data = data.get("deployment", {})
+        deployment = None
+        if deployment_data:
+            deployment = DeploymentInfo(
+                installation_methods=deployment_data.get("installation_methods", []),
+                system_requirements=deployment_data.get("system_requirements", []),
+                container_support=deployment_data.get("container_support", []),
+                cloud_deployment=deployment_data.get("cloud_deployment", []),
+                configuration_files=deployment_data.get("configuration_files", [])
+            )
+        
+        # 测试信息 - Linus风格：可执行的指导
+        testing_data = data.get("testing", {})
+        testing = None
+        if testing_data:
+            testing = TestingInfo(
+                test_commands=testing_data.get("test_commands", []),
+                test_data_sources=testing_data.get("test_data_sources", []),
+                example_datasets=testing_data.get("example_datasets", []),
+                validation_methods=testing_data.get("validation_methods", []),
+                benchmark_datasets=testing_data.get("benchmark_datasets", [])
+            )
+        
+        # 数据需求 - Linus风格：明确具体
+        data_req_data = data.get("data_requirements", {})
+        data_requirements = None
+        if data_req_data:
+            data_requirements = DataRequirements(
+                required_inputs=data_req_data.get("required_inputs", []),
+                optional_inputs=data_req_data.get("optional_inputs", []),
+                data_formats=data_req_data.get("data_formats", []),
+                file_size_limits=data_req_data.get("file_size_limits", ""),
+                preprocessing_steps=data_req_data.get("preprocessing_steps", [])
+            )
+        
         return {
             "publications": publications,
             "functionality": functionality,
             "usage": usage,
-            "performance": performance,  # 现在包含真实的性能分析
+            "performance": performance,
+            "deployment": deployment,           # 新增
+            "testing": testing,                 # 新增
+            "data_requirements": data_requirements,  # 新增
             "code_quality": None,  # 砍掉不必要的复杂性
             "bioinformatics_expertise": None,
             "usability": None
@@ -306,8 +379,11 @@ README内容：
                 examples=[],
                 parameters=[]
             ),
-            "code_quality": None,
             "performance": None,
+            "deployment": None,
+            "testing": None,
+            "data_requirements": None,
+            "code_quality": None,
             "bioinformatics_expertise": None,
             "usability": None
         }
@@ -322,6 +398,9 @@ README内容：
             publications=defaults["publications"],
             functionality=defaults["functionality"],
             usage=defaults["usage"],
+            deployment=defaults["deployment"],
+            testing=defaults["testing"],
+            data_requirements=defaults["data_requirements"],
             analysis_timestamp=datetime.now().isoformat()
         )
 

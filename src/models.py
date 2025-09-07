@@ -54,6 +54,36 @@ class UsageInfo(BaseModel):
     parameters: List[str]
 
 
+class DeploymentInfo(BaseModel):
+    """部署信息模型 - Linus风格：简单实用"""
+    
+    installation_methods: List[str]  # 安装方式：conda, pip, docker等
+    system_requirements: List[str]   # 系统要求
+    container_support: List[str]     # 容器支持：docker, singularity等
+    cloud_deployment: List[str]      # 云部署选项
+    configuration_files: List[str]   # 配置文件
+
+
+class TestingInfo(BaseModel):
+    """测试信息模型 - Linus风格：实用导向"""
+    
+    test_commands: List[str]         # 测试命令
+    test_data_sources: List[str]     # 测试数据来源
+    example_datasets: List[str]      # 示例数据集
+    validation_methods: List[str]    # 验证方法
+    benchmark_datasets: List[str]    # 基准数据集
+
+
+class DataRequirements(BaseModel):
+    """数据需求模型 - Linus风格：明确具体"""
+    
+    required_inputs: List[str]       # 必需输入
+    optional_inputs: List[str]       # 可选输入
+    data_formats: List[str]          # 数据格式要求
+    file_size_limits: str            # 文件大小限制
+    preprocessing_steps: List[str]   # 预处理步骤
+
+
 class ProjectArchitecture(BaseModel):
     """项目架构信息模型"""
     
@@ -117,4 +147,7 @@ class BioToolAnalysis(BaseModel):
     performance: Optional[PerformanceInfo] = None
     bioinformatics_expertise: Optional[BioinformaticsExpertiseInfo] = None
     usability: Optional[UsabilityInfo] = None
+    deployment: Optional[DeploymentInfo] = None  # 新增：部署信息
+    testing: Optional[TestingInfo] = None        # 新增：测试信息  
+    data_requirements: Optional[DataRequirements] = None  # 新增：数据需求
     analysis_timestamp: str

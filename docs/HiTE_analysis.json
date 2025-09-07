@@ -15,52 +15,26 @@
       "github_username": null
     }
   ],
-  "publications": [
-    {
-      "title": "panHiTE: a comprehensive and accurate pipeline for TE detection in large-scale population genomes",
-      "authors": [],
-      "journal": null,
-      "year": 2025,
-      "doi": "10.1101/2025.02.15.638472",
-      "pmid": null
-    }
-  ],
+  "publications": [],
   "functionality": {
-    "main_purpose": "使用动态边界调整方法检测并注释基因组组装中的全长转座元件（TE）",
-    "key_features": [
-      "支持大规模种群基因组分析",
-      "相比其他工具能检测更多全长TE",
-      "提供panHiTE流程用于群体基因组分析"
-    ],
-    "input_formats": [
-      "FASTA"
-    ],
-    "output_formats": [
-      "GFF"
-    ],
-    "dependencies": [
-      "Python 3",
-      "Conda",
-      "Singularity",
-      "Docker",
-      "Nextflow"
-    ]
+    "main_purpose": "生物信息学工具",
+    "key_features": [],
+    "input_formats": [],
+    "output_formats": [],
+    "dependencies": []
   },
   "usage": {
-    "installation": "git clone https://github.com/CSU-KangHu/HiTE.git",
-    "basic_usage": "python main.py --genome [基因组文件] --thread [线程数] --out_dir [输出目录]",
-    "examples": [
-      "python main.py --genome /home/hukang/HiTE/demo/genome.fa --thread 40 --out_dir /home/hukang/HiTE/demo/test/",
-      "singularity run -B /home/hukang:/home/hukang /home/hukang/HiTE.sif python /HiTE/main.py --genome /home/hukang/HiTE/demo/genome.fa --thread 40 --out_dir /home/hukang/HiTE/demo/test/"
-    ],
+    "installation": "参考README",
+    "basic_usage": "参考README",
+    "examples": [],
     "parameters": []
   },
   "architecture": {
     "programming_languages": [
-      "Shell",
-      "Python",
       "Perl",
+      "Python",
       "R",
+      "Shell",
       "C++"
     ],
     "frameworks": [],
@@ -127,14 +101,14 @@
       ".idea": "普通目录"
     },
     "main_components": [
-      "tools",
-      "classification",
-      "module",
       "Docker容器",
-      "RNA_seq",
-      "bin",
+      "classification",
       "demo",
-      "library"
+      "library",
+      "module",
+      "bin",
+      "tools",
+      "RNA_seq"
     ],
     "entry_points": [
       "主程序文件: main.nf",
@@ -144,14 +118,11 @@
     "test_structure": {}
   },
   "code_quality": null,
-  "performance": {
-    "time_complexity": "基于多进程并行处理，复杂度约为 O(n/p)，其中 n 为输入数据量，p 为线程数",
-    "space_complexity": "推荐使用 40 CPU 核心和 128 GB 内存",
-    "parallelization": "支持容器化部署（Docker/Singularity） 支持 Nextflow 工作流管理系统实现自动并行和错误恢复 多线程并行处理基因组分块（chrom_seg_length 默认 1,000,000）",
-    "resource_usage": "推荐使用 40 CPU 核心和 128 GB 内存",
-    "optimization_suggestions": []
-  },
+  "performance": null,
   "bioinformatics_expertise": null,
   "usability": null,
-  "analysis_timestamp": "2025-09-07T15:39:35.666570"
+  "deployment": null,
+  "testing": null,
+  "data_requirements": null,
+  "analysis_timestamp": "2025-09-07T16:09:13.710747"
 }

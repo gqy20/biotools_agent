@@ -255,19 +255,7 @@
         <div class="card">
             <h2>📚 相关发表文章</h2>
             
-                
-                <div class="publication">
-                    <h3>panHiTE: a comprehensive and accurate pipeline for TE detection in large-scale population genomes</h3>
-                    <p><strong>作者:</strong> </p>
-                    
-                    
-                        <p><strong>年份:</strong> 2025</p>
-                    
-                    
-                        <p><strong>DOI:</strong> <a href="https://doi.org/10.1101/2025.02.15.638472" target="_blank">10.1101/2025.02.15.638472</a></p>
-                    
-                </div>
-                
+                <p>暂无相关发表文章信息</p>
             
         </div>
 
@@ -276,52 +264,22 @@
             <h2>🔧 功能特性</h2>
             <div class="info-item">
                 <strong>主要用途</strong>
-                使用动态边界调整方法检测并注释基因组组装中的全长转座元件（TE）
+                生物信息学工具
             </div>
             
-            
-            <h3 style="margin-top: 25px; margin-bottom: 15px;">核心功能</h3>
-            <ul class="feature-list">
-                
-                <li>支持大规模种群基因组分析</li>
-                
-                <li>相比其他工具能检测更多全长TE</li>
-                
-                <li>提供panHiTE流程用于群体基因组分析</li>
-                
-            </ul>
             
 
             <div class="info-grid" style="margin-top: 25px;">
                 <div class="info-item">
                     <strong>输入格式</strong>
                     
-                        <span class="tag">FASTA</span>
-                    
                 </div>
                 <div class="info-item">
                     <strong>输出格式</strong>
                     
-                        <span class="tag">GFF</span>
-                    
                 </div>
             </div>
 
-            
-            <div class="info-item" style="margin-top: 20px;">
-                <strong>主要依赖</strong>
-                
-                    <span class="tag">Python 3</span>
-                
-                    <span class="tag">Conda</span>
-                
-                    <span class="tag">Singularity</span>
-                
-                    <span class="tag">Docker</span>
-                
-                    <span class="tag">Nextflow</span>
-                
-            </div>
             
         </div>
 
@@ -334,13 +292,13 @@
             <div class="info-item">
                 <strong>编程语言</strong>
                 
-                    <span class="tag">Shell</span>
+                    <span class="tag">Perl</span>
                 
                     <span class="tag">Python</span>
                 
-                    <span class="tag">Perl</span>
-                
                     <span class="tag">R</span>
+                
+                    <span class="tag">Shell</span>
                 
                     <span class="tag">C++</span>
                 
@@ -676,31 +634,6 @@
 
         <!-- 性能特征 -->
         
-        <div class="card">
-            <h2>⚡ 性能特征</h2>
-            
-            <div class="info-grid">
-                <div class="info-item">
-                    <strong>时间复杂度</strong>
-                    基于多进程并行处理，复杂度约为 O(n/p)，其中 n 为输入数据量，p 为线程数
-                </div>
-                <div class="info-item">
-                    <strong>空间复杂度</strong>
-                    推荐使用 40 CPU 核心和 128 GB 内存
-                </div>
-                <div class="info-item">
-                    <strong>并行化支持</strong>
-                    支持容器化部署（Docker/Singularity） 支持 Nextflow 工作流管理系统实现自动并行和错误恢复 多线程并行处理基因组分块（chrom_seg_length 默认 1,000,000）
-                </div>
-                <div class="info-item">
-                    <strong>资源使用</strong>
-                    推荐使用 40 CPU 核心和 128 GB 内存
-                </div>
-            </div>
-            
-            
-        </div>
-        
 
         <!-- 生物信息学专业性 -->
         
@@ -713,17 +646,10 @@
             <h2>💻 使用方法</h2>
             
             <h3>安装方法</h3>
-            <div class="code-block">git clone https://github.com/CSU-KangHu/HiTE.git</div>
+            <div class="code-block">参考README</div>
             
             <h3>基本用法</h3>
-            <div class="code-block">python main.py --genome [基因组文件] --thread [线程数] --out_dir [输出目录]</div>
-            
-            
-            <h3>使用示例</h3>
-            
-            <div class="code-block">python main.py --genome /home/hukang/HiTE/demo/genome.fa --thread 40 --out_dir /home/hukang/HiTE/demo/test/</div>
-            
-            <div class="code-block">singularity run -B /home/hukang:/home/hukang /home/hukang/HiTE.sif python /HiTE/main.py --genome /home/hukang/HiTE/demo/genome.fa --thread 40 --out_dir /home/hukang/HiTE/demo/test/</div>
+            <div class="code-block">参考README</div>
             
             
 
@@ -732,7 +658,7 @@
 
         <!-- 分析信息 -->
         <div class="meta-info">
-            <p>分析时间: 2025-09-07T15:39:35.666570</p>
+            <p>分析时间: 2025-09-07T16:09:13.710747</p>
             <p>报告由 BioTools Agent 自动生成</p>
         </div>
     </div>

@@ -1,14 +1,50 @@
+# 环境文件
 .env
+.env.local
 .env_bak
+
+# 临时目录和克隆的仓库
 tmp/
 bio/
+
+# 文档文件（特定的）
 QWEN.md
 GEMINI.md
+
+# Python缓存文件 (重要：这些不应该被追踪)
 src/__pycache__/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
 # Python包构建文件 (自动生成)
 *.egg-info/
 dist/
 build/
-__pycache__/
-*.pyc
-*.pyo
+
+# 测试和临时文件
+test_*.py
+*_test.py
+*.tmp
+*.temp
+
+# 分析结果文件（可选：如果不想追踪生成的报告）
+# docs/*_analysis.html
+# docs/*_analysis.json
+# docs/*_analysis.md
+
+# IDE和编辑器文件
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# 日志文件
+*.log
+logs/
