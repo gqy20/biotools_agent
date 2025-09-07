@@ -3,4 +3,12 @@
 tmp/
 bio/
 QWEN.md
+GEMINI.md
 src/__pycache__/
+# Python包构建文件 (自动生成)
+*.egg-info/
+dist/
+build/
+__pycache__/
+*.pyc
+*.pyo

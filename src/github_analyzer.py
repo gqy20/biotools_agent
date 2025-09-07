@@ -58,9 +58,17 @@ class GitHubAnalyzer:
         api_url = f"https://api.github.com/repos/{owner}/{repo_name}"
         
         try:
+            # 首先尝试带认证的调用
             response = requests.get(api_url, headers=self.headers, timeout=10)
+            
+            # 如果认证失败，尝试无认证调用
+            if response.status_code == 401:
+                print("⚠️ GitHub认证失败，尝试无认证访问...")
+                response = requests.get(api_url, timeout=10)
+            
             if response.status_code == 200:
                 data = response.json()
+                print(f"✅ 成功获取GitHub仓库信息: {data.get('stargazers_count')} stars")
                 return RepositoryInfo(
                     name=data.get("name", repo_name),
                     url=repo_url,
@@ -71,6 +79,7 @@ class GitHubAnalyzer:
                     license=data.get("license", {}).get("name") if data.get("license") else None
                 )
             else:
+                print(f"⚠️ GitHub API调用失败，状态码: {response.status_code}")
                 # API调用失败，使用基础信息
                 return RepositoryInfo(
                     name=repo_name,
@@ -78,6 +87,11 @@ class GitHubAnalyzer:
                 )
         except Exception as e:
             print(f"⚠️ 获取仓库信息失败: {e}")
+            # 异常情况，使用基础信息
+            return RepositoryInfo(
+                name=repo_name,
+                url=repo_url
+            )
             return RepositoryInfo(
                 name=repo_name,
                 url=repo_url

@@ -1,0 +1,105 @@
+{
+  "repository": {
+    "name": "yahs",
+    "url": "https://github.com/c-zhou/yahs",
+    "description": "Yet another Hi-C scaffolding tool",
+    "language": "C",
+    "stars": 160,
+    "forks": 20,
+    "license": "MIT License"
+  },
+  "authors": [
+    {
+      "name": "Chenxi Zhou",
+      "email": "chnx.zhou@gmail.com",
+      "github_username": null
+    },
+    {
+      "name": "cz370 cz370",
+      "email": "cz370@login-e-9.data.cluster",
+      "github_username": null
+    },
+    {
+      "name": "c-zhou",
+      "email": "chnx.zhou@gmail.com",
+      "github_username": null
+    }
+  ],
+  "publications": [],
+  "functionality": {
+    "main_purpose": "生物信息学分析工具",
+    "key_features": [],
+    "input_formats": [],
+    "output_formats": [],
+    "dependencies": []
+  },
+  "usage": {
+    "installation": "请参考项目README文档",
+    "basic_usage": "请查看项目文档获取使用方法",
+    "examples": [],
+    "parameters": []
+  },
+  "architecture": {
+    "programming_languages": [
+      "C",
+      "Shell"
+    ],
+    "frameworks": [],
+    "directory_structure": {
+      "kalloc.h": "根目录文件",
+      "LICENSE": "根目录文件",
+      "yahs.c": "根目录文件",
+      "README.md": "根目录文件",
+      ".git": "普通目录",
+      "kopen.c": "根目录文件",
+      "Makefile": "根目录文件",
+      "binomlite.c": "根目录文件",
+      "kdq.h": "根目录文件",
+      "bamlite.h": "根目录文件",
+      "break.c": "根目录文件",
+      "graph.h": "根目录文件",
+      "graph.c": "根目录文件",
+      "asset.h": "根目录文件",
+      "telo.h": "根目录文件",
+      "asset.c": "根目录文件",
+      "sdict.c": "根目录文件",
+      ".gitignore": "根目录文件",
+      "break.h": "根目录文件",
+      "scripts": "脚本目录",
+      "telo.c": "根目录文件",
+      "link.h": "根目录文件",
+      "sdict.h": "根目录文件",
+      "enzyme.c": "根目录文件",
+      "link.c": "根目录文件",
+      "kalloc.c": "根目录文件",
+      "juicer.c": "根目录文件",
+      "ksort.h": "根目录文件",
+      "cov.c": "根目录文件",
+      "bamlite.c": "根目录文件",
+      "version.h": "根目录文件",
+      "agp-spec.h": "根目录文件",
+      "khash.h": "根目录文件",
+      "kseq.h": "根目录文件",
+      "ketopt.h": "根目录文件",
+      "agp_to_fasta.c": "根目录文件",
+      "enzyme.h": "根目录文件",
+      "cov.h": "根目录文件",
+      "kvec.h": "根目录文件"
+    },
+    "main_components": [
+      "scripts",
+      "构建工具"
+    ],
+    "entry_points": [
+      "可执行脚本: run_test.sh",
+      "可执行脚本: run_yahs.sh"
+    ],
+    "config_files": [],
+    "test_structure": {}
+  },
+  "code_quality": null,
+  "performance": null,
+  "bioinformatics_expertise": null,
+  "usability": null,
+  "analysis_timestamp": "2025-09-07T15:19:51.473774"
+}

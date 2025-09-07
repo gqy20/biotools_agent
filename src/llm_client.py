@@ -96,7 +96,7 @@ class LLMClient:
             raise e
     
     def extract_json_from_response(self, response: str) -> Optional[Dict[str, Any]]:
-        """从响应中提取JSON数据"""
+        """从响应中提取JSON数据，并验证数据质量"""
         try:
             # 查找JSON部分
             json_start = response.find('{')
@@ -105,7 +105,15 @@ class LLMClient:
             if json_start >= 0 and json_end > json_start:
                 json_content = response[json_start:json_end]
                 print(f"📊 提取JSON内容: {len(json_content)} 字符")
-                return json.loads(json_content)
+                
+                data = json.loads(json_content)
+                
+                # 验证数据质量
+                if self._contains_garbage_data(data):
+                    print("❌ 检测到垃圾数据，拒绝返回")
+                    return None
+                
+                return data
             else:
                 print("⚠️ 响应中未找到有效JSON")
                 return None
@@ -113,3 +121,38 @@ class LLMClient:
         except json.JSONDecodeError as e:
             print(f"❌ JSON解析失败: {e}")
             return None
+    
+    def _contains_garbage_data(self, data: Dict[str, Any]) -> bool:
+        """检测是否包含垃圾数据"""
+        garbage_strings = [
+            "未说明", "未知", "无", "N/A", "未定义", "暂无",
+            # 添加模板占位符检测
+            "文章标题", "作者", "期刊", "DOI", "主要用途一句话",
+            "功能1", "功能2", "功能3", "输入格式", "输出格式",
+            "代码结构评价", "文档质量评价", "时间复杂度描述", 
+            "并行化支持描述", "算法准确性评价", "适用场景1", "适用场景2",
+            "文档完整性评价", "学习曲线评价"
+        ]
+        
+        def check_value(value):
+            if isinstance(value, str):
+                return value.strip() in garbage_strings or not value.strip()
+            elif isinstance(value, list):
+                return any(check_value(item) for item in value)
+            elif isinstance(value, dict):
+                return any(check_value(v) for v in value.values())
+            elif isinstance(value, int) and value == 0:
+                # 对于某些字段，0值可能是垃圾数据（如年份）
+                return False  # 暂时不检查0值，因为stars可能为0
+            return False
+        
+        # 检查publications中的垃圾数据
+        publications = data.get("publications", [])
+        if publications:
+            for pub in publications:
+                if isinstance(pub, dict):
+                    title = pub.get("title", "")
+                    if isinstance(title, str) and title.strip() in garbage_strings:
+                        return True
+        
+        return check_value(data)
