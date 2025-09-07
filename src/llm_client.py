@@ -123,36 +123,50 @@ class LLMClient:
             return None
     
     def _contains_garbage_data(self, data: Dict[str, Any]) -> bool:
-        """检测是否包含垃圾数据"""
-        garbage_strings = [
-            "未说明", "未知", "无", "N/A", "未定义", "暂无",
-            # 添加模板占位符检测
-            "文章标题", "作者", "期刊", "DOI", "主要用途一句话",
-            "功能1", "功能2", "功能3", "输入格式", "输出格式",
-            "代码结构评价", "文档质量评价", "时间复杂度描述", 
-            "并行化支持描述", "算法准确性评价", "适用场景1", "适用场景2",
-            "文档完整性评价", "学习曲线评价"
-        ]
+        """检测垃圾数据 - Linus风格: 严格标准"""
+        # 明确的垃圾字符串列表
+        garbage_strings = {
+            # 中文垃圾
+            "未说明", "未知", "无", "未定义", "暂无", "未明确列出", "未指定",
+            # 英文垃圾  
+            "Unknown", "N/A", "TBD", "Not specified", "Not mentioned", "Not available",
+            # 模板占位符
+            "文章标题", "作者", "期刊", "DOI", "主要用途一句话", "功能1", "功能2", "功能3",
+            "输入格式", "输出格式", "代码结构评价", "文档质量评价", "时间复杂度描述",
+            "并行化支持描述", "算法准确性评价", "适用场景1", "适用场景2", "文档完整性评价",
+            "学习曲线评价", "基于README分析", "参考README"
+        }
         
-        def check_value(value):
+        def is_garbage(value) -> bool:
             if isinstance(value, str):
-                return value.strip() in garbage_strings or not value.strip()
+                stripped = value.strip()
+                # 空字符串或仅空白符
+                if not stripped:
+                    return True
+                # 明确的垃圾字符串
+                if stripped in garbage_strings:
+                    return True
+                # 包含垃圾模式的字符串
+                if any(garbage in stripped for garbage in ["未明确", "请参考", "基于README"]):
+                    return True
+                return False
             elif isinstance(value, list):
-                return any(check_value(item) for item in value)
+                return any(is_garbage(item) for item in value)
             elif isinstance(value, dict):
-                return any(check_value(v) for v in value.values())
-            elif isinstance(value, int) and value == 0:
-                # 对于某些字段，0值可能是垃圾数据（如年份）
-                return False  # 暂时不检查0值，因为stars可能为0
+                return any(is_garbage(v) for v in value.values())
             return False
         
-        # 检查publications中的垃圾数据
+        # 特别检查publications中的垃圾作者信息
         publications = data.get("publications", [])
-        if publications:
-            for pub in publications:
-                if isinstance(pub, dict):
-                    title = pub.get("title", "")
-                    if isinstance(title, str) and title.strip() in garbage_strings:
-                        return True
+        for pub in publications:
+            if isinstance(pub, dict):
+                authors = pub.get("authors", [])
+                if authors and any(is_garbage(author) for author in authors):
+                    print(f"❌ 检测到垃圾作者信息: {authors}")
+                    return True
         
-        return check_value(data)
+        # 递归检查所有数据
+        if is_garbage(data):
+            return True
+            
+        return False

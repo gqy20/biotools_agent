@@ -23,10 +23,10 @@
 
 
 
-### panHiTE: a comprehensive and accurate pipeline for transposable element detection in large-scale population genomes
+### panHiTE: a comprehensive and accurate pipeline for TE detection in large-scale population genomes
 
-- **作者**: 未明确列出
-- **期刊**: bioRxiv
+- **作者**: 
+
 - **年份**: 2025
 - **DOI**: [10.1101/2025.02.15.638472](https://doi.org/10.1101/2025.02.15.638472)
 
@@ -36,22 +36,22 @@
 ## 🔧 功能特性
 
 ### 主要用途
-使用动态边界调整方法检测和注释基因组组装中的全长转座元件（TEs）
+使用动态边界调整方法检测并注释基因组组装中的全长转座元件（TE）
 
 ### 核心功能
 
-- 比其他工具检测到更多全长TEs
+- 支持大规模种群基因组分析
 
-- 支持大规模种群基因组分析（panHiTE）
+- 相比其他工具能检测更多全长TE
 
-- 预测TE中的保守蛋白结构域
+- 提供panHiTE流程用于群体基因组分析
 
 
 ### 支持格式
 
-**输入格式**: `fasta`, `fa`, `fna`
+**输入格式**: `FASTA`
 
-**输出格式**: `fasta`, `gff`, `tbl`, `文本文件`
+**输出格式**: `GFF`
 
 ### 主要依赖
 
@@ -71,15 +71,15 @@
 
 ### 编程语言
 
+- `Shell`
+
 - `Python`
 
-- `Shell`
+- `Perl`
 
 - `R`
 
 - `C++`
-
-- `Perl`
 
 
 ### 框架/库
@@ -219,77 +219,39 @@
 ## 💻 代码质量
 
 
-### 评估结果
-
-- **代码结构**: 项目包含清晰的代码结构，有main.py和配置脚本
-- **文档质量**: 文档质量较高，包含安装、使用、输入输出说明，以及常见问题链接
-- **测试覆盖度**: 未明确说明
-- **代码风格**: 未明确说明
-
-### 最佳实践
-
-- 提供多种安装和运行方式（Conda, Docker, Singularity, Nextflow）
-
-- 推荐使用空目录作为输出路径以避免文件冲突
-
-
 
 ## ⚡ 性能特征
 
 
 ### 性能指标
 
-- **时间复杂度**: 未明确说明
-- **空间复杂度**: 未明确说明
-- **并行化支持**: 支持多线程处理（通过--thread参数）
-- **资源使用**: 推荐硬件配置：40个CPU核心，128 GB内存
+- **时间复杂度**: 基于多进程并行处理，复杂度约为 O(n/p)，其中 n 为输入数据量，p 为线程数
+- **空间复杂度**: 推荐使用 40 CPU 核心和 128 GB 内存
+- **并行化支持**: 支持容器化部署（Docker/Singularity） 支持 Nextflow 工作流管理系统实现自动并行和错误恢复 多线程并行处理基因组分块（chrom_seg_length 默认 1,000,000）
+- **资源使用**: 推荐使用 40 CPU 核心和 128 GB 内存
 
 ### 优化建议
-
-- 使用--curated_lib参数预掩码高同源序列以减少计算负载
-
-- 使用推荐的硬件配置以获得最佳性能
 
 
 
 ## 🧬 生物信息学专业性
 
 
-### 专业评估
-
-- **算法准确性**: 比现有工具检测到更多全长TEs
-- **基准测试结果**: 未明确说明
-- **工具比较**: 未详细说明与其他工具的对比细节
-
-### 适用场景
-
-- 基因组组装中的TE检测
-
-- 大规模种群基因组分析（通过panHiTE）
-
-
 
 ## 👋 可用性
 
-
-### 可用性评估
-
-- **文档完整性**: 文档完整性较高，包含安装、使用、输入输出、演示数据、常见问题等信息
-- **用户界面**: 基于命令行接口，参数清晰
-- **错误处理**: 未明确说明
-- **学习曲线**: 中等学习曲线，需要熟悉命令行操作和生物信息学基本概念
 
 
 ## 💻 使用方法
 
 ### 安装方法
 ```bash
-支持多种安装方式：Git克隆项目、Conda环境创建、Singularity镜像拉取、Docker镜像拉取、Nextflow工作流
+git clone https://github.com/CSU-KangHu/HiTE.git
 ```
 
 ### 基本用法
 ```bash
-python main.py --genome <genome_file> --thread <num_threads> --out_dir <output_directory>
+python main.py --genome [基因组文件] --thread [线程数] --out_dir [输出目录]
 ```
 
 
@@ -306,24 +268,9 @@ singularity run -B /home/hukang:/home/hukang /home/hukang/HiTE.sif python /HiTE/
 
 
 
-### 主要参数
-
-- --genome: 指定输入基因组文件路径
-
-- --thread: 指定使用的线程数
-
-- --out_dir: 指定输出目录
-
-- --curated_lib: 提供可信的TE库用于预掩码
-
-- --annotate: 使用HiTE生成的TE库进行基因组注释
-
-- --domain 1: 预测TE中的保守蛋白结构域
-
-
 
 ---
 
-*分析时间: 2025-09-07T15:22:04.921683*  
+*分析时间: 2025-09-07T15:39:35.666570*  
 *报告由 BioTools Agent 自动生成*
         

@@ -257,10 +257,8 @@
             
                 
                 <div class="publication">
-                    <h3>panHiTE: a comprehensive and accurate pipeline for transposable element detection in large-scale population genomes</h3>
-                    <p><strong>作者:</strong> 未明确列出</p>
-                    
-                        <p><strong>期刊:</strong> bioRxiv</p>
+                    <h3>panHiTE: a comprehensive and accurate pipeline for TE detection in large-scale population genomes</h3>
+                    <p><strong>作者:</strong> </p>
                     
                     
                         <p><strong>年份:</strong> 2025</p>
@@ -278,18 +276,18 @@
             <h2>🔧 功能特性</h2>
             <div class="info-item">
                 <strong>主要用途</strong>
-                使用动态边界调整方法检测和注释基因组组装中的全长转座元件（TEs）
+                使用动态边界调整方法检测并注释基因组组装中的全长转座元件（TE）
             </div>
             
             
             <h3 style="margin-top: 25px; margin-bottom: 15px;">核心功能</h3>
             <ul class="feature-list">
                 
-                <li>比其他工具检测到更多全长TEs</li>
+                <li>支持大规模种群基因组分析</li>
                 
-                <li>支持大规模种群基因组分析（panHiTE）</li>
+                <li>相比其他工具能检测更多全长TE</li>
                 
-                <li>预测TE中的保守蛋白结构域</li>
+                <li>提供panHiTE流程用于群体基因组分析</li>
                 
             </ul>
             
@@ -298,23 +296,13 @@
                 <div class="info-item">
                     <strong>输入格式</strong>
                     
-                        <span class="tag">fasta</span>
-                    
-                        <span class="tag">fa</span>
-                    
-                        <span class="tag">fna</span>
+                        <span class="tag">FASTA</span>
                     
                 </div>
                 <div class="info-item">
                     <strong>输出格式</strong>
                     
-                        <span class="tag">fasta</span>
-                    
-                        <span class="tag">gff</span>
-                    
-                        <span class="tag">tbl</span>
-                    
-                        <span class="tag">文本文件</span>
+                        <span class="tag">GFF</span>
                     
                 </div>
             </div>
@@ -346,15 +334,15 @@
             <div class="info-item">
                 <strong>编程语言</strong>
                 
+                    <span class="tag">Shell</span>
+                
                     <span class="tag">Python</span>
                 
-                    <span class="tag">Shell</span>
+                    <span class="tag">Perl</span>
                 
                     <span class="tag">R</span>
                 
                     <span class="tag">C++</span>
-                
-                    <span class="tag">Perl</span>
                 
             </div>
             
@@ -685,40 +673,6 @@
 
         <!-- 代码质量 -->
         
-        <div class="card">
-            <h2>💻 代码质量</h2>
-            
-            <div class="info-grid">
-                <div class="info-item">
-                    <strong>代码结构</strong>
-                    项目包含清晰的代码结构，有main.py和配置脚本
-                </div>
-                <div class="info-item">
-                    <strong>文档质量</strong>
-                    文档质量较高，包含安装、使用、输入输出说明，以及常见问题链接
-                </div>
-                <div class="info-item">
-                    <strong>测试覆盖度</strong>
-                    未明确说明
-                </div>
-                <div class="info-item">
-                    <strong>代码风格</strong>
-                    未明确说明
-                </div>
-            </div>
-            
-            
-            <h3 style="margin-top: 25px; margin-bottom: 15px;">最佳实践</h3>
-            <ul class="feature-list">
-                
-                <li>提供多种安装和运行方式（Conda, Docker, Singularity, Nextflow）</li>
-                
-                <li>推荐使用空目录作为输出路径以避免文件冲突</li>
-                
-            </ul>
-            
-        </div>
-        
 
         <!-- 性能特征 -->
         
@@ -728,92 +682,30 @@
             <div class="info-grid">
                 <div class="info-item">
                     <strong>时间复杂度</strong>
-                    未明确说明
+                    基于多进程并行处理，复杂度约为 O(n/p)，其中 n 为输入数据量，p 为线程数
                 </div>
                 <div class="info-item">
                     <strong>空间复杂度</strong>
-                    未明确说明
+                    推荐使用 40 CPU 核心和 128 GB 内存
                 </div>
                 <div class="info-item">
                     <strong>并行化支持</strong>
-                    支持多线程处理（通过--thread参数）
+                    支持容器化部署（Docker/Singularity） 支持 Nextflow 工作流管理系统实现自动并行和错误恢复 多线程并行处理基因组分块（chrom_seg_length 默认 1,000,000）
                 </div>
                 <div class="info-item">
                     <strong>资源使用</strong>
-                    推荐硬件配置：40个CPU核心，128 GB内存
+                    推荐使用 40 CPU 核心和 128 GB 内存
                 </div>
             </div>
             
-            
-            <h3 style="margin-top: 25px; margin-bottom: 15px;">优化建议</h3>
-            <ul class="feature-list">
-                
-                <li>使用--curated_lib参数预掩码高同源序列以减少计算负载</li>
-                
-                <li>使用推荐的硬件配置以获得最佳性能</li>
-                
-            </ul>
             
         </div>
         
 
         <!-- 生物信息学专业性 -->
         
-        <div class="card">
-            <h2>🧬 生物信息学专业性</h2>
-            
-            <div class="info-grid">
-                <div class="info-item">
-                    <strong>算法准确性</strong>
-                    比现有工具检测到更多全长TEs
-                </div>
-                <div class="info-item">
-                    <strong>基准测试结果</strong>
-                    未明确说明
-                </div>
-                <div class="info-item">
-                    <strong>工具比较</strong>
-                    未详细说明与其他工具的对比细节
-                </div>
-            </div>
-            
-            
-            <h3 style="margin-top: 25px; margin-bottom: 15px;">适用场景</h3>
-            <ul class="feature-list">
-                
-                <li>基因组组装中的TE检测</li>
-                
-                <li>大规模种群基因组分析（通过panHiTE）</li>
-                
-            </ul>
-            
-        </div>
-        
 
         <!-- 可用性 -->
-        
-        <div class="card">
-            <h2>👋 可用性</h2>
-            
-            <div class="info-grid">
-                <div class="info-item">
-                    <strong>文档完整性</strong>
-                    文档完整性较高，包含安装、使用、输入输出、演示数据、常见问题等信息
-                </div>
-                <div class="info-item">
-                    <strong>用户界面</strong>
-                    基于命令行接口，参数清晰
-                </div>
-                <div class="info-item">
-                    <strong>错误处理</strong>
-                    未明确说明
-                </div>
-                <div class="info-item">
-                    <strong>学习曲线</strong>
-                    中等学习曲线，需要熟悉命令行操作和生物信息学基本概念
-                </div>
-            </div>
-        </div>
         
 
         <!-- 使用方法 -->
@@ -821,10 +713,10 @@
             <h2>💻 使用方法</h2>
             
             <h3>安装方法</h3>
-            <div class="code-block">支持多种安装方式：Git克隆项目、Conda环境创建、Singularity镜像拉取、Docker镜像拉取、Nextflow工作流</div>
+            <div class="code-block">git clone https://github.com/CSU-KangHu/HiTE.git</div>
             
             <h3>基本用法</h3>
-            <div class="code-block">python main.py --genome <genome_file> --thread <num_threads> --out_dir <output_directory></div>
+            <div class="code-block">python main.py --genome [基因组文件] --thread [线程数] --out_dir [输出目录]</div>
             
             
             <h3>使用示例</h3>
@@ -836,28 +728,11 @@
             
 
             
-            <h3>主要参数</h3>
-            <ul class="feature-list">
-                
-                <li>--genome: 指定输入基因组文件路径</li>
-                
-                <li>--thread: 指定使用的线程数</li>
-                
-                <li>--out_dir: 指定输出目录</li>
-                
-                <li>--curated_lib: 提供可信的TE库用于预掩码</li>
-                
-                <li>--annotate: 使用HiTE生成的TE库进行基因组注释</li>
-                
-                <li>--domain 1: 预测TE中的保守蛋白结构域</li>
-                
-            </ul>
-            
         </div>
 
         <!-- 分析信息 -->
         <div class="meta-info">
-            <p>分析时间: 2025-09-07T15:22:04.921683</p>
+            <p>分析时间: 2025-09-07T15:39:35.666570</p>
             <p>报告由 BioTools Agent 自动生成</p>
         </div>
     </div>

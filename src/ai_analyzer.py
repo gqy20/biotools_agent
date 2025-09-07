@@ -37,7 +37,7 @@ class AIAnalyzer:
         
         # 一次性AI分析获取所有信息
         print("🤖 一次性AI分析获取所有信息...")
-        analysis_result = self._analyze_all_in_one(readme_content)
+        analysis_result = self._analyze_all_in_one(readme_content, repo_path)
         
         # 组装完整分析结果
         print("📋 组装完整分析结果...")
@@ -93,77 +93,120 @@ class AIAnalyzer:
         print("⚠️ 未找到README文件")
         return ""
     
-    def _build_analysis_prompt(self, readme_content: str) -> str:
-        """构建分析用的prompt"""
-        # 截取README内容，避免过长
-        content_preview = readme_content[:8000] if len(readme_content) > 8000 else readme_content
+    def _collect_core_code_samples(self, repo_path: Path) -> str:
+        """收集核心代码样本 - Linus风格：找到算法核心"""
+        print("🔍 收集核心代码样本...")
         
-        return f"""
-分析生物信息学工具README，返回JSON格式信息：
+        # 核心文件模式 - 生物信息学工具常见的核心文件
+        core_patterns = [
+            "main.py", "main.cpp", "main.c", "main.java",
+            "*algorithm*", "*core*", "*engine*", 
+            "*align*", "*search*", "*index*", "*parse*",
+            "*.py", "*.cpp", "*.c", "*.java", "*.R"
+        ]
+        
+        code_samples = []
+        file_count = 0
+        max_files = 5  # 限制文件数量
+        max_content = 2000  # 每个文件最大内容长度
+        
+        for pattern in core_patterns:
+            if file_count >= max_files:
+                break
+                
+            # 查找匹配的文件
+            try:
+                for file_path in repo_path.rglob(pattern):
+                    if file_count >= max_files:
+                        break
+                        
+                    # 跳过不相关目录
+                    if any(skip in str(file_path) for skip in ['.git', '__pycache__', 'test', 'doc', 'example']):
+                        continue
+                        
+                    if file_path.is_file() and file_path.stat().st_size < 50000:  # 小于50KB
+                        try:
+                            with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+                                content = f.read()[:max_content]
+                                if content.strip():
+                                    relative_path = file_path.relative_to(repo_path)
+                                    code_samples.append(f"=== {relative_path} ===\n{content}\n")
+                                    file_count += 1
+                                    print(f"📄 收集代码文件: {relative_path}")
+                        except Exception:
+                            continue
+            except Exception:
+                continue
+        
+        result = "\n".join(code_samples)
+        print(f"✅ 收集了 {file_count} 个核心代码文件，总长度: {len(result)} 字符")
+        return result
+    
+    def _build_analysis_prompt(self, readme_content: str, code_content: str = "") -> str:
+        """构建分析用的prompt - Linus风格：消除特殊情况"""
+        # 截取README内容，避免过长
+        content_preview = readme_content[:6000] if len(readme_content) > 6000 else readme_content
+        code_preview = code_content[:4000] if len(code_content) > 4000 else code_content
+        
+        prompt = f"""分析这个生物信息学工具的README文档"""
+        
+        if code_content:
+            prompt += "和核心代码"
+            
+        prompt += f"""，提取其中的事实信息。所有回答必须使用中文。
 
 README内容：
-{content_preview}
+{content_preview}"""
 
-返回JSON格式：
-{{
+        if code_content:
+            prompt += f"""
+
+核心代码片段：
+{code_preview}"""
+
+        prompt += """
+
+返回JSON格式，仅包含明确提到或可以从代码中分析出的信息：
+
+{
     "publications": [
-        {{"title": "文章标题", "authors": ["作者"], "journal": "期刊", "year": 年份, "doi": "DOI"}}
+        // 仅当README明确提到论文标题时才包含
+        {"title": "README中的确切标题", "journal": "如果提到期刊名", "year": 年份数字, "doi": "如果有DOI"}
     ],
-    "functionality": {{
-        "main_purpose": "主要用途一句话",
-        "key_features": ["功能1", "功能2", "功能3"],
-        "input_formats": ["输入格式"],
-        "output_formats": ["输出格式"],
-        "dependencies": ["依赖项"]
-    }},
-    "usage": {{
-        "installation": "安装方法",
-        "basic_usage": "基本用法",
-        "examples": ["示例1", "示例2"],
-        "parameters": ["参数说明"]
-    }},
-    "code_quality": {{
-        "code_structure": "代码结构评价",
-        "documentation_quality": "文档质量评价",
-        "test_coverage": "测试覆盖度评价",
-        "code_style": "代码风格评价",
-        "best_practices": ["最佳实践1", "最佳实践2"]
-    }},
-    "performance": {{
-        "time_complexity": "时间复杂度描述",
-        "space_complexity": "空间复杂度描述",
-        "parallelization": "并行化支持描述",
-        "resource_usage": "资源使用情况",
-        "optimization_suggestions": ["优化建议1", "优化建议2"]
-    }},
-    "bioinformatics_expertise": {{
-        "algorithm_accuracy": "算法准确性评价",
-        "benchmark_results": "基准测试结果",
-        "tool_comparison": "与其他工具比较",
-        "applicable_scenarios": ["适用场景1", "适用场景2"]
-    }},
-    "usability": {{
-        "documentation_completeness": "文档完整性评价",
-        "user_interface": "用户界面评价",
-        "error_handling": "错误处理机制评价",
-        "learning_curve": "学习曲线评价"
-    }}
-}}
+    "functionality": {
+        "main_purpose": "用一句中文描述此工具的用途",
+        "key_features": ["功能特点1", "功能特点2"],  // 仅README明确提到的功能
+        "input_formats": ["FASTA", "BAM"],  // 仅明确提到的输入格式
+        "output_formats": ["GFF", "VCF"],   // 仅明确提到的输出格式
+        "dependencies": ["Python", "BWA"]   // 仅明确提到的依赖
+    },
+    "usage": {
+        "installation": "README中的确切安装命令",
+        "basic_usage": "基本使用命令",
+        "examples": ["示例1", "示例2"]
+    },
+    "performance": {
+        "algorithm_complexity": "基于代码分析的算法复杂度",
+        "resource_requirements": "资源需求分析", 
+        "optimization_features": "发现的优化特性"
+    }
+}
 
 严格要求：
-1. 仅基于README内容分析，不得编造任何信息
-2. 如果README中没有明确信息，直接省略该字段，不要返回空值或"未说明"
-3. publications数组：只有在README明确提到文章时才返回，否则返回空数组
-4. 重点识别生物信息学格式(FASTA/BAM/VCF等)
-5. 确保有效JSON格式，所有字符串值必须有实际内容
-6. 禁止使用"未说明"、"未知"、"无"、"N/A"等占位符
-"""
+1. 所有文本必须使用中文表达
+2. 仅提取README中明确写明的信息
+3. 如果提供了代码，结合代码进行算法复杂度分析
+4. 如果信息缺失，直接省略该字段
+5. 绝不使用占位符或模板文本
+6. 返回简洁、事实性的中文JSON"""
+
+        return prompt
 
     def _call_llm_for_analysis(self, prompt: str) -> Optional[str]:
         """调用LLM进行分析"""
         try:
             messages = [
-                {"role": "system", "content": "You are a helpful assistant specialized in bioinformatics tools analysis. Please respond in the exact JSON format requested."},
+                {"role": "system", "content": "你是专门分析生物信息学工具的助手。请严格按照要求的JSON格式回答，所有内容必须使用中文表达。"},
                 {"role": "user", "content": prompt}
             ]
             
@@ -178,115 +221,88 @@ README内容：
             return None
 
     def _parse_analysis_result(self, llm_response: str) -> dict:
-        """解析LLM返回的分析结果"""
+        """解析LLM返回的分析结果 - Linus风格: 消除复杂度"""
         data = self.llm_client.extract_json_from_response(llm_response)
         
         if not data:
-            print("⚠️ 未能获取有效的分析结果，使用默认值")
-            return self._get_default_analysis_data()
+            print("⚠️ 未能获取有效的分析结果，使用最小默认值")
+            return self._get_minimal_defaults()
         
-        # 解析publications
-        publications = []
-        for pub_data in data.get("publications", []):
-            pub = Publication(
-                title=pub_data.get("title", ""),
-                authors=pub_data.get("authors", []),
-                journal=pub_data.get("journal"),
-                year=pub_data.get("year"),
-                doi=pub_data.get("doi"),
-                pmid=pub_data.get("pmid")
+        # 简单直接的解析 - 不要过度处理
+        publications = [
+            Publication(
+                title=pub.get("title", ""),
+                authors=pub.get("authors", []),
+                journal=pub.get("journal"),
+                year=pub.get("year"),
+                doi=pub.get("doi")
             )
-            publications.append(pub)
+            for pub in data.get("publications", [])
+            if pub.get("title")  # 只有title存在才创建
+        ]
         
-        # 解析其他组件
-        functionality = self._parse_functionality(data.get("functionality", {}))
-        usage = self._parse_usage(data.get("usage", {}))
-        code_quality = self._parse_code_quality(data.get("code_quality", {}))
-        performance = self._parse_performance(data.get("performance", {}))
-        bioinformatics_expertise = self._parse_bioinformatics_expertise(data.get("bioinformatics_expertise", {}))
-        usability = self._parse_usability(data.get("usability", {}))
-        
-        return {
-            "publications": publications,
-            "functionality": functionality,
-            "usage": usage,
-            "code_quality": code_quality,
-            "performance": performance,
-            "bioinformatics_expertise": bioinformatics_expertise,
-            "usability": usability
-        }
-
-    def _parse_functionality(self, func_data: dict) -> FunctionalityInfo:
-        """解析功能信息"""
-        return FunctionalityInfo(
-            main_purpose=func_data.get("main_purpose", "生物信息学分析工具"),
+        # 功能信息 - 简单获取，没有复杂的默认值处理
+        func_data = data.get("functionality", {})
+        functionality = FunctionalityInfo(
+            main_purpose=func_data.get("main_purpose", "生物信息学工具"),
             key_features=func_data.get("key_features", []),
             input_formats=func_data.get("input_formats", []),
             output_formats=func_data.get("output_formats", []),
             dependencies=func_data.get("dependencies", [])
         )
-
-    def _parse_usage(self, usage_data: dict) -> UsageInfo:
-        """解析使用方法信息"""
-        return UsageInfo(
-            installation=usage_data.get("installation", "请参考项目README文档"),
-            basic_usage=usage_data.get("basic_usage", "请查看项目文档获取使用方法"),
+        
+        # 使用信息 - 最简实现
+        usage_data = data.get("usage", {})
+        usage = UsageInfo(
+            installation=usage_data.get("installation", "参考README"),
+            basic_usage=usage_data.get("basic_usage", "参考README"),
             examples=usage_data.get("examples", []),
             parameters=usage_data.get("parameters", [])
         )
+        
+        # 性能信息 - 基于代码和README的综合分析
+        performance_data = data.get("performance", {})
+        performance = None
+        if performance_data:
+            # 安全地处理可能是数组的字段
+            def safe_get_string(data_dict, key, default=""):
+                value = data_dict.get(key, default)
+                if isinstance(value, list):
+                    return " ".join(str(v) for v in value) if value else default
+                return str(value) if value else default
+            
+            performance = PerformanceInfo(
+                time_complexity=safe_get_string(performance_data, "algorithm_complexity"),
+                space_complexity=safe_get_string(performance_data, "resource_requirements"),
+                parallelization=safe_get_string(performance_data, "optimization_features"),
+                resource_usage=safe_get_string(performance_data, "resource_requirements"),
+                optimization_suggestions=[]
+            )
+        
+        return {
+            "publications": publications,
+            "functionality": functionality,
+            "usage": usage,
+            "performance": performance,  # 现在包含真实的性能分析
+            "code_quality": None,  # 砍掉不必要的复杂性
+            "bioinformatics_expertise": None,
+            "usability": None
+        }
 
-    def _parse_code_quality(self, code_quality_data: dict) -> CodeQualityInfo:
-        """解析代码质量信息"""
-        return CodeQualityInfo(
-            code_structure=code_quality_data.get("code_structure", "基于README分析"),
-            documentation_quality=code_quality_data.get("documentation_quality", "基于README分析"),
-            test_coverage=code_quality_data.get("test_coverage", "基于README分析"),
-            code_style=code_quality_data.get("code_style", "基于README分析"),
-            best_practices=code_quality_data.get("best_practices", [])
-        )
-
-    def _parse_performance(self, performance_data: dict) -> PerformanceInfo:
-        """解析性能特征信息"""
-        return PerformanceInfo(
-            time_complexity=performance_data.get("time_complexity", "基于README分析"),
-            space_complexity=performance_data.get("space_complexity", "基于README分析"),
-            parallelization=performance_data.get("parallelization", "基于README分析"),
-            resource_usage=performance_data.get("resource_usage", "基于README分析"),
-            optimization_suggestions=performance_data.get("optimization_suggestions", [])
-        )
-
-    def _parse_bioinformatics_expertise(self, bioinformatics_data: dict) -> BioinformaticsExpertiseInfo:
-        """解析生物信息学专业性信息"""
-        return BioinformaticsExpertiseInfo(
-            algorithm_accuracy=bioinformatics_data.get("algorithm_accuracy", "基于README分析"),
-            benchmark_results=bioinformatics_data.get("benchmark_results", "基于README分析"),
-            tool_comparison=bioinformatics_data.get("tool_comparison", "基于README分析"),
-            applicable_scenarios=bioinformatics_data.get("applicable_scenarios", [])
-        )
-
-    def _parse_usability(self, usability_data: dict) -> UsabilityInfo:
-        """解析可用性信息"""
-        return UsabilityInfo(
-            documentation_completeness=usability_data.get("documentation_completeness", "基于README分析"),
-            user_interface=usability_data.get("user_interface", "基于README分析"),
-            error_handling=usability_data.get("error_handling", "基于README分析"),
-            learning_curve=usability_data.get("learning_curve", "基于README分析")
-        )
-
-    def _get_default_analysis_data(self) -> dict:
-        """获取默认分析数据"""
+    def _get_minimal_defaults(self) -> dict:
+        """获取最小默认数据 - Linus风格: 简单直接"""
         return {
             "publications": [],
             "functionality": FunctionalityInfo(
-                main_purpose="生物信息学分析工具",
+                main_purpose="生物信息学工具",
                 key_features=[],
                 input_formats=[],
                 output_formats=[],
                 dependencies=[]
             ),
             "usage": UsageInfo(
-                installation="请参考项目README文档",
-                basic_usage="请查看项目文档获取使用方法",
+                installation="参考README",
+                basic_usage="参考README", 
                 examples=[],
                 parameters=[]
             ),
@@ -296,57 +312,32 @@ README内容：
             "usability": None
         }
 
-    def _analyze_all_in_one(self, readme_content: str) -> dict:
-        """重构后的分析函数 - 单一职责原则"""
-        # 1. 构建prompt
-        prompt = self._build_analysis_prompt(readme_content)
-        
-        # 2. 调用LLM
-        llm_response = self._call_llm_for_analysis(prompt)
-        if not llm_response:
-            return self._get_default_analysis_data()
-        
-        # 3. 解析结果
-        return self._parse_analysis_result(llm_response)
-    
     def _create_default_analysis(self, repo_info, authors) -> BioToolAnalysis:
         """创建默认分析结果"""
-        default_data = self._get_default_analysis_data()
+        defaults = self._get_minimal_defaults()
         
         return BioToolAnalysis(
             repository=repo_info,
             authors=authors,
-            publications=default_data["publications"],
-            functionality=default_data["functionality"],
-            usage=default_data["usage"],
-            code_quality=default_data["code_quality"],
-            performance=default_data["performance"],
-            bioinformatics_expertise=default_data["bioinformatics_expertise"],
-            usability=default_data["usability"],
+            publications=defaults["publications"],
+            functionality=defaults["functionality"],
+            usage=defaults["usage"],
             analysis_timestamp=datetime.now().isoformat()
         )
-    
-    def _get_default_analysis_data(self) -> dict:
-        """获取默认分析数据"""
-        return {
-            "publications": [],
-            "functionality": FunctionalityInfo(
-                main_purpose="生物信息学分析工具",
-                key_features=[],
-                input_formats=[],
-                output_formats=[],
-                dependencies=[]
-            ),
-            "usage": UsageInfo(
-                installation="请参考项目README文档",
-                basic_usage="请查看项目文档获取使用方法",
-                examples=[],
-                parameters=[]
-            ),
-            "code_quality": None,
-            "performance": None,
-            "bioinformatics_expertise": None,
-            "usability": None
-        }
-    
+
+    def _analyze_all_in_one(self, readme_content: str, repo_path: Path) -> dict:
+        """一次性分析 - Linus风格：简单高效"""
+        # 1. 收集代码样本用于深度分析
+        code_content = self._collect_core_code_samples(repo_path)
+        
+        # 2. 构建包含代码的prompt
+        prompt = self._build_analysis_prompt(readme_content, code_content)
+        
+        # 3. 调用LLM
+        llm_response = self._call_llm_for_analysis(prompt)
+        if not llm_response:
+            return self._get_minimal_defaults()
+        
+        # 4. 解析结果
+        return self._parse_analysis_result(llm_response)
 
