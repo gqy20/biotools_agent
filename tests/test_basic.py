@@ -1,8 +1,9 @@
 """基础功能测试"""
 
 import pytest
-from src.models import RepositoryInfo, AuthorInfo
+
 from src.github_analyzer import GitHubAnalyzer
+from src.models import AuthorInfo, RepositoryInfo
 
 
 def test_repository_info_creation():

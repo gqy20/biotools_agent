@@ -1,9 +1,8 @@
 """可视化文档生成器"""
 
 import json
-from datetime import datetime
 from pathlib import Path
-from typing import Dict, Any
+from typing import Dict
 
 from jinja2 import Template
 
@@ -12,14 +11,14 @@ from .models import BioToolAnalysis
 
 class DocumentVisualizer:
     """文档可视化生成器"""
-    
+
     def __init__(self, output_dir: str = "docs"):
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(exist_ok=True)
-    
+
     def generate_html_report(self, analysis: BioToolAnalysis) -> Path:
         """生成HTML格式的分析报告"""
-        
+
         # HTML模板
         html_template = """
 <!DOCTYPE html>
@@ -553,23 +552,23 @@ class DocumentVisualizer:
 </body>
 </html>
         """
-        
+
         template = Template(html_template)
         html_content = template.render(analysis=analysis)
-        
+
         # 生成文件名
         safe_name = self._sanitize_filename(analysis.repository.name)
         output_file = self.output_dir / f"{safe_name}_analysis.html"
-        
-        with open(output_file, 'w', encoding='utf-8') as f:
+
+        with open(output_file, "w", encoding="utf-8") as f:
             f.write(html_content)
-        
+
         print(f"✅ HTML报告已生成: {output_file}")
         return output_file
-    
+
     def generate_markdown_report(self, analysis: BioToolAnalysis) -> Path:
         """生成Markdown格式的分析报告"""
-        
+
         # Markdown模板
         md_template = """# {{ analysis.repository.name }} - 分析报告
 
@@ -744,65 +743,66 @@ class DocumentVisualizer:
 *分析时间: {{ analysis.analysis_timestamp }}*  
 *报告由 BioTools Agent 自动生成*
         """
-        
+
         template = Template(md_template)
         md_content = template.render(analysis=analysis)
-        
+
         # 生成文件名
         safe_name = self._sanitize_filename(analysis.repository.name)
         output_file = self.output_dir / f"{safe_name}_analysis.md"
-        
-        with open(output_file, 'w', encoding='utf-8') as f:
+
+        with open(output_file, "w", encoding="utf-8") as f:
             f.write(md_content)
-        
+
         print(f"✅ Markdown报告已生成: {output_file}")
         return output_file
-    
+
     def generate_json_report(self, analysis: BioToolAnalysis) -> Path:
         """生成JSON格式的分析数据"""
-        
+
         # 生成文件名
         safe_name = self._sanitize_filename(analysis.repository.name)
         output_file = self.output_dir / f"{safe_name}_analysis.json"
-        
+
         # 转换HttpUrl为字符串以便JSON序列化
         data = analysis.model_dump()
-        if 'repository' in data and 'url' in data['repository']:
-            data['repository']['url'] = str(data['repository']['url'])
-        
-        with open(output_file, 'w', encoding='utf-8') as f:
+        if "repository" in data and "url" in data["repository"]:
+            data["repository"]["url"] = str(data["repository"]["url"])
+
+        with open(output_file, "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
-        
+
         print(f"✅ JSON数据已生成: {output_file}")
         return output_file
-    
+
     def generate_all_reports(self, analysis: BioToolAnalysis) -> Dict[str, Path]:
         """生成所有格式的报告"""
-        
+
         reports = {}
-        
+
         try:
-            reports['html'] = self.generate_html_report(analysis)
+            reports["html"] = self.generate_html_report(analysis)
         except Exception as e:
             print(f"⚠️ HTML报告生成失败: {e}")
-        
+
         try:
-            reports['markdown'] = self.generate_markdown_report(analysis)
+            reports["markdown"] = self.generate_markdown_report(analysis)
         except Exception as e:
             print(f"⚠️ Markdown报告生成失败: {e}")
-        
+
         try:
-            reports['json'] = self.generate_json_report(analysis)
+            reports["json"] = self.generate_json_report(analysis)
         except Exception as e:
             print(f"⚠️ JSON数据生成失败: {e}")
-        
+
         return reports
-    
+
     def _sanitize_filename(self, filename: str) -> str:
         """清理文件名，移除不安全字符"""
         import re
+
         # 移除不安全字符，保留字母、数字、下划线和短横线
-        safe_name = re.sub(r'[^\w\-_.]', '_', filename)
+        safe_name = re.sub(r"[^\w\-_.]", "_", filename)
         # 移除多余的下划线
-        safe_name = re.sub(r'_+', '_', safe_name)
-        return safe_name.strip('_')
+        safe_name = re.sub(r"_+", "_", safe_name)
+        return safe_name.strip("_")

@@ -1,12 +1,12 @@
-"""Supabase 客户端模块，用于与数据库交互"""
+"""Supabase数据库客户端"""
 
-import os
-import json
 import uuid
 from typing import Optional
-from supabase import create_client, Client
-from .models import BioToolAnalysis
+
+from supabase import Client, create_client
+
 from .config import config_manager
+from .models import BioToolAnalysis
 
 
 class SupabaseManager:
@@ -16,7 +16,7 @@ class SupabaseManager:
         self.url = config_manager.config.supabase_url
         self.key = config_manager.config.supabase_key
         self.client: Optional[Client] = None
-        
+
         if self.url and self.key:
             try:
                 self.client = create_client(self.url, self.key)
@@ -41,30 +41,31 @@ class SupabaseManager:
             # 将 Pydantic 模型转换为字典
             # 注意：需要将 HttpUrl 转换为字符串
             data_dict = analysis.model_dump()
-            if 'repository' in data_dict and 'url' in data_dict['repository']:
-                data_dict['repository']['url'] = str(data_dict['repository']['url'])
-            
+            if "repository" in data_dict and "url" in data_dict["repository"]:
+                data_dict["repository"]["url"] = str(data_dict["repository"]["url"])
+
             # 为每次测试生成唯一的test_id
             test_id = str(uuid.uuid4())
-            
+
             # 准备插入的数据
             repo_url = str(analysis.repository.url)
-            insert_data = {
-                "test_id": test_id,
-                "repo_url": repo_url,
-                "data": data_dict
-            }
-            
+            insert_data = {"test_id": test_id, "repo_url": repo_url, "data": data_dict}
+
             # 使用 insert 操作，确保每次测试都创建新记录
-            response = self.client.table("bio_analysis_results").insert(insert_data).execute()
-            
+            response = (
+                self.client.table("bio_analysis_results").insert(insert_data).execute()
+            )
+
             if response.data:
                 print(f"✅ 分析结果已保存到数据库: {repo_url} (测试ID: {test_id})")
                 return True
             else:
-                print(f"⚠️ 保存分析结果时未返回数据: {response.error.message if response.error else '未知错误'}")
+                print(
+                    f"⚠️ 保存分析结果时未返回数据: "
+                    f"{response.error.message if response.error else '未知错误'}"
+                )
                 return False
-                
+
         except Exception as e:
             print(f"❌ 保存分析结果到数据库时发生异常: {e}")
             return False
