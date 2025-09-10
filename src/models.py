@@ -135,6 +135,30 @@ class UsabilityInfo(BaseModel):
     learning_curve: str
 
 
+class SecurityVulnerability(BaseModel):
+    """单个安全漏洞模型 - MVP实现"""
+    
+    id: str  # CVE-2023-xxxx, GHSA-xxxx, BANDIT-xxxx
+    severity: str  # HIGH, MEDIUM, LOW
+    package: str  # 受影响的包名
+    installed_version: str  # 当前版本
+    fixed_version: Optional[str] = None  # 修复版本
+    description: str  # 漏洞描述
+
+
+class SecurityAnalysis(BaseModel):
+    """安全分析结果 - MVP版本，关注最关键安全问题"""
+    
+    scan_timestamp: str
+    vulnerabilities: List[SecurityVulnerability]
+    total_high_risk: int = 0
+    total_medium_risk: int = 0 
+    total_low_risk: int = 0
+    scan_tools_used: List[str]  # ['pip-audit', 'bandit']
+    recommendations: List[str]  # 具体的修复建议
+    scan_success: bool = True  # 扫描是否成功
+
+
 class BioToolAnalysis(BaseModel):
     """完整的生物信息学工具分析结果"""
 
@@ -151,4 +175,5 @@ class BioToolAnalysis(BaseModel):
     deployment: Optional[DeploymentInfo] = None  # 新增：部署信息
     testing: Optional[TestingInfo] = None  # 新增：测试信息
     data_requirements: Optional[DataRequirements] = None  # 新增：数据需求
+    security: Optional[SecurityAnalysis] = None  # 新增：安全分析
     analysis_timestamp: str

@@ -197,7 +197,7 @@
             <p>High-precision TE Annotator</p>
             <div class="stats">
                 <div class="stat-item">
-                    <span class="stat-number">126</span>
+                    <span class="stat-number">127</span>
                     <span class="stat-label">Stars</span>
                 </div>
                 <div class="stat-item">
@@ -255,7 +255,19 @@
         <div class="card">
             <h2>📚 相关发表文章</h2>
             
-                <p>暂无相关发表文章信息</p>
+                
+                <div class="publication">
+                    <h3>panHiTE: a comprehensive and accurate pipeline for TE detection in large-scale population genomes</h3>
+                    <p><strong>作者:</strong> </p>
+                    
+                    
+                        <p><strong>年份:</strong> 2025</p>
+                    
+                    
+                        <p><strong>DOI:</strong> <a href="https://doi.org/10.1101/2025.02.15.638472" target="_blank">10.1101/2025.02.15.638472</a></p>
+                    
+                </div>
+                
             
         </div>
 
@@ -264,22 +276,52 @@
             <h2>🔧 功能特性</h2>
             <div class="info-item">
                 <strong>主要用途</strong>
-                生物信息学工具
+                使用动态边界调整方法检测和注释基因组组装中的全长转座元件（TE）
             </div>
             
+            
+            <h3 style="margin-top: 25px; margin-bottom: 15px;">核心功能</h3>
+            <ul class="feature-list">
+                
+                <li>比其他工具检测到更多全长TE</li>
+                
+                <li>支持大规模种群基因组分析</li>
+                
+                <li>提供panHiTE流程用于群体基因组TE检测</li>
+                
+            </ul>
             
 
             <div class="info-grid" style="margin-top: 25px;">
                 <div class="info-item">
                     <strong>输入格式</strong>
                     
+                        <span class="tag">FASTA</span>
+                    
                 </div>
                 <div class="info-item">
                     <strong>输出格式</strong>
                     
+                        <span class="tag">GFF</span>
+                    
                 </div>
             </div>
 
+            
+            <div class="info-item" style="margin-top: 20px;">
+                <strong>主要依赖</strong>
+                
+                    <span class="tag">Python</span>
+                
+                    <span class="tag">Conda</span>
+                
+                    <span class="tag">Docker</span>
+                
+                    <span class="tag">Singularity</span>
+                
+                    <span class="tag">Nextflow</span>
+                
+            </div>
             
         </div>
 
@@ -292,13 +334,13 @@
             <div class="info-item">
                 <strong>编程语言</strong>
                 
-                    <span class="tag">Perl</span>
-                
-                    <span class="tag">Python</span>
+                    <span class="tag">Shell</span>
                 
                     <span class="tag">R</span>
                 
-                    <span class="tag">Shell</span>
+                    <span class="tag">Perl</span>
+                
+                    <span class="tag">Python</span>
                 
                     <span class="tag">C++</span>
                 
@@ -634,6 +676,31 @@
 
         <!-- 性能特征 -->
         
+        <div class="card">
+            <h2>⚡ 性能特征</h2>
+            
+            <div class="info-grid">
+                <div class="info-item">
+                    <strong>时间复杂度</strong>
+                    未明确提及，但使用多线程处理，支持大规模基因组分析
+                </div>
+                <div class="info-item">
+                    <strong>空间复杂度</strong>
+                    推荐硬件：40个CPU核心，128GB内存
+                </div>
+                <div class="info-item">
+                    <strong>并行化支持</strong>
+                    多线程并行处理 支持容器化部署（Docker/Singularity） 支持Nextflow进行工作流管理
+                </div>
+                <div class="info-item">
+                    <strong>资源使用</strong>
+                    推荐硬件：40个CPU核心，128GB内存
+                </div>
+            </div>
+            
+            
+        </div>
+        
 
         <!-- 生物信息学专业性 -->
         
@@ -641,15 +708,67 @@
         <!-- 可用性 -->
         
 
+        <!-- 安全风险分析 -->
+        
+        <div class="card">
+            <h2>🔒 安全风险分析</h2>
+            
+            <div class="info-grid">
+                <div class="info-item">
+                    <strong>高风险漏洞</strong>
+                    <span style="color: #d32f2f; font-size: 1.5em; font-weight: bold;">0</span>
+                </div>
+                <div class="info-item">
+                    <strong>中风险漏洞</strong>
+                    <span style="color: #f57c00; font-size: 1.5em; font-weight: bold;">0</span>
+                </div>
+                <div class="info-item">
+                    <strong>低风险漏洞</strong>
+                    <span style="color: #388e3c; font-size: 1.5em; font-weight: bold;">0</span>
+                </div>
+                <div class="info-item">
+                    <strong>扫描工具</strong>
+                    
+                        <span class="tag">bandit</span>
+                    
+                </div>
+            </div>
+            
+            
+            
+            
+            <h3 style="margin-top: 25px; margin-bottom: 15px;">安全建议</h3>
+            <ul class="feature-list">
+                
+                <li>未发现明显的安全问题，建议定期进行安全检查</li>
+                
+            </ul>
+            
+            
+            <div style="margin-top: 20px; font-size: 0.9em; color: #666;">
+                <small>扫描时间: 2025-09-10T12:13:37.685236</small>
+            </div>
+        </div>
+        
+
         <!-- 使用方法 -->
         <div class="card">
             <h2>💻 使用方法</h2>
             
             <h3>安装方法</h3>
-            <div class="code-block">参考README</div>
+            <div class="code-block">git clone https://github.com/CSU-KangHu/HiTE.git</div>
             
             <h3>基本用法</h3>
-            <div class="code-block">参考README</div>
+            <div class="code-block">python main.py --genome ${genome} --thread ${thread} --out_dir ${output_dir}</div>
+            
+            
+            <h3>使用示例</h3>
+            
+            <div class="code-block">python main.py --genome /home/hukang/HiTE/demo/genome.fa --thread 40 --out_dir /home/hukang/HiTE/demo/test/</div>
+            
+            <div class="code-block">singularity run -B /home/hukang:/home/hukang /home/hukang/HiTE.sif python /HiTE/main.py --genome /home/hukang/HiTE/demo/genome.fa --thread 40 --out_dir /home/hukang/HiTE/demo/test/</div>
+            
+            <div class="code-block">docker run -v /home/hukang:/home/hukang kanghu/hite:3.3.3 python main.py --genome /home/hukang/HiTE/demo/genome.fa --thread 40 --out_dir /home/hukang/HiTE/demo/test/</div>
             
             
 
@@ -658,7 +777,7 @@
 
         <!-- 分析信息 -->
         <div class="meta-info">
-            <p>分析时间: 2025-09-07T16:09:13.710747</p>
+            <p>分析时间: 2025-09-10T12:13:09.646732</p>
             <p>报告由 BioTools Agent 自动生成</p>
         </div>
     </div>

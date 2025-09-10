@@ -516,6 +516,103 @@ class DocumentVisualizer:
         </div>
         {% endif %}
 
+        <!-- 安全风险分析 -->
+        {% if analysis.security %}
+        <div class="card">
+            <h2>🔒 安全风险分析</h2>
+            
+            <div class="info-grid">
+                <div class="info-item">
+                    <strong>高风险漏洞</strong>
+                    <span style="color: #d32f2f; font-size: 1.5em; font-weight: bold;">{{ analysis.security.total_high_risk }}</span>
+                </div>
+                <div class="info-item">
+                    <strong>中风险漏洞</strong>
+                    <span style="color: #f57c00; font-size: 1.5em; font-weight: bold;">{{ analysis.security.total_medium_risk }}</span>
+                </div>
+                <div class="info-item">
+                    <strong>低风险漏洞</strong>
+                    <span style="color: #388e3c; font-size: 1.5em; font-weight: bold;">{{ analysis.security.total_low_risk }}</span>
+                </div>
+                <div class="info-item">
+                    <strong>扫描工具</strong>
+                    {% for tool in analysis.security.scan_tools_used %}
+                        <span class="tag">{{ tool }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            {% if analysis.security.vulnerabilities %}
+            <h3 style="margin-top: 25px; margin-bottom: 15px;">发现的安全问题</h3>
+            
+            {% set high_vulns = analysis.security.vulnerabilities | selectattr("severity", "equalto", "HIGH") | list %}
+            {% set medium_vulns = analysis.security.vulnerabilities | selectattr("severity", "equalto", "MEDIUM") | list %}  
+            {% set low_vulns = analysis.security.vulnerabilities | selectattr("severity", "equalto", "LOW") | list %}
+            
+            {% if high_vulns %}
+            <h4 style="color: #d32f2f; margin: 15px 0 10px;">🔴 高风险漏洞 ({{ high_vulns | length }})</h4>
+            {% for vuln in high_vulns[:5] %}
+            <div class="info-item" style="margin-bottom: 15px; border-left-color: #d32f2f; background: #ffebee;">
+                <strong>{{ vuln.id }} <span style="color: #d32f2f; font-size: 0.9em;">[{{ vuln.severity }}]</span></strong><br>
+                <small><strong>包:</strong> {{ vuln.package }} ({{ vuln.installed_version }})</small><br>
+                <small>{{ vuln.description }}</small>
+                {% if vuln.fixed_version %}
+                <br><small style="color: #4caf50;"><strong>修复版本:</strong> {{ vuln.fixed_version }}</small>
+                {% endif %}
+            </div>
+            {% endfor %}
+            {% if high_vulns | length > 5 %}<p style="color: #d32f2f; font-size: 0.9em;">...还有 {{ high_vulns | length - 5 }} 个高风险漏洞</p>{% endif %}
+            {% endif %}
+            
+            {% if medium_vulns %}
+            <h4 style="color: #f57c00; margin: 15px 0 10px;">🟡 中风险漏洞 ({{ medium_vulns | length }})</h4>
+            {% for vuln in medium_vulns[:3] %}
+            <div class="info-item" style="margin-bottom: 15px; border-left-color: #f57c00; background: #fff3e0;">
+                <strong>{{ vuln.id }} <span style="color: #f57c00; font-size: 0.9em;">[{{ vuln.severity }}]</span></strong><br>
+                <small><strong>包:</strong> {{ vuln.package }} ({{ vuln.installed_version }})</small><br>
+                <small>{{ vuln.description }}</small>
+                {% if vuln.fixed_version %}
+                <br><small style="color: #4caf50;"><strong>修复版本:</strong> {{ vuln.fixed_version }}</small>
+                {% endif %}
+            </div>
+            {% endfor %}
+            {% if medium_vulns | length > 3 %}<p style="color: #f57c00; font-size: 0.9em;">...还有 {{ medium_vulns | length - 3 }} 个中风险漏洞</p>{% endif %}
+            {% endif %}
+            
+            {% if low_vulns %}
+            <h4 style="color: #388e3c; margin: 15px 0 10px;">🟢 低风险漏洞 ({{ low_vulns | length }})</h4>
+            {% if low_vulns | length <= 2 %}
+                {% for vuln in low_vulns %}
+                <div class="info-item" style="margin-bottom: 15px; border-left-color: #388e3c; background: #e8f5e8;">
+                    <strong>{{ vuln.id }} <span style="color: #388e3c; font-size: 0.9em;">[{{ vuln.severity }}]</span></strong><br>
+                    <small><strong>包:</strong> {{ vuln.package }} ({{ vuln.installed_version }})</small><br>
+                    <small>{{ vuln.description }}</small>
+                    {% if vuln.fixed_version %}
+                    <br><small style="color: #4caf50;"><strong>修复版本:</strong> {{ vuln.fixed_version }}</small>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            {% else %}
+                <p style="color: #388e3c;">发现 {{ low_vulns | length }} 个低风险漏洞，建议在方便时进行修复</p>
+            {% endif %}
+            {% endif %}
+            {% endif %}
+            
+            {% if analysis.security.recommendations %}
+            <h3 style="margin-top: 25px; margin-bottom: 15px;">安全建议</h3>
+            <ul class="feature-list">
+                {% for rec in analysis.security.recommendations %}
+                <li>{{ rec }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+            
+            <div style="margin-top: 20px; font-size: 0.9em; color: #666;">
+                <small>扫描时间: {{ analysis.security.scan_timestamp }}</small>
+            </div>
+        </div>
+        {% endif %}
+
         <!-- 使用方法 -->
         <div class="card">
             <h2>💻 使用方法</h2>
@@ -708,6 +805,87 @@ class DocumentVisualizer:
 - **用户界面**: {{ analysis.usability.user_interface }}
 - **错误处理**: {{ analysis.usability.error_handling }}
 - **学习曲线**: {{ analysis.usability.learning_curve }}
+{% endif %}
+
+## 🔒 安全风险分析
+
+{% if analysis.security %}
+### 安全风险概览
+
+| 风险级别 | 数量 |
+|----------|------|
+| **高风险** | {{ analysis.security.total_high_risk }} |
+| **中风险** | {{ analysis.security.total_medium_risk }} |
+| **低风险** | {{ analysis.security.total_low_risk }} |
+
+**扫描工具**: {% for tool in analysis.security.scan_tools_used %}`{{ tool }}`{% if not loop.last %}, {% endif %}{% endfor %}
+
+{% if analysis.security.vulnerabilities %}
+### 发现的安全问题
+
+{% set high_vulns = analysis.security.vulnerabilities | selectattr("severity", "equalto", "HIGH") | list %}
+{% set medium_vulns = analysis.security.vulnerabilities | selectattr("severity", "equalto", "MEDIUM") | list %}
+{% set low_vulns = analysis.security.vulnerabilities | selectattr("severity", "equalto", "LOW") | list %}
+
+{% if high_vulns %}
+#### 🔴 高风险漏洞 ({{ high_vulns | length }})
+
+{% for vuln in high_vulns[:5] %}
+**{{ vuln.id }}** [HIGH]
+- 包名: {{ vuln.package }} ({{ vuln.installed_version }})
+- 问题: {{ vuln.description }}
+{% if vuln.fixed_version %}- 修复版本: {{ vuln.fixed_version }}{% endif %}
+
+{% endfor %}
+{% if high_vulns | length > 5 %}*...还有 {{ high_vulns | length - 5 }} 个高风险漏洞*
+
+{% endif %}
+{% endif %}
+
+{% if medium_vulns %}
+#### 🟡 中风险漏洞 ({{ medium_vulns | length }})
+
+{% for vuln in medium_vulns[:3] %}
+**{{ vuln.id }}** [MEDIUM] 
+- 包名: {{ vuln.package }} ({{ vuln.installed_version }})
+- 问题: {{ vuln.description }}
+{% if vuln.fixed_version %}- 修复版本: {{ vuln.fixed_version }}{% endif %}
+
+{% endfor %}
+{% if medium_vulns | length > 3 %}*...还有 {{ medium_vulns | length - 3 }} 个中风险漏洞*
+
+{% endif %}
+{% endif %}
+
+{% if low_vulns %}
+#### 🟢 低风险漏洞 ({{ low_vulns | length }})
+
+{% if low_vulns | length <= 2 %}
+{% for vuln in low_vulns %}
+**{{ vuln.id }}** [LOW]
+- 包名: {{ vuln.package }} ({{ vuln.installed_version }})
+- 问题: {{ vuln.description }}
+{% if vuln.fixed_version %}- 修复版本: {{ vuln.fixed_version }}{% endif %}
+
+{% endfor %}
+{% else %}
+发现 {{ low_vulns | length }} 个低风险漏洞，建议在方便时进行修复
+
+{% endif %}
+{% endif %}
+{% endif %}
+
+{% if analysis.security.recommendations %}
+### 安全建议
+
+{% for rec in analysis.security.recommendations %}
+- {{ rec }}
+{% endfor %}
+{% endif %}
+
+*扫描时间: {{ analysis.security.scan_timestamp }}*
+{% else %}
+暂未进行安全风险分析。
 {% endif %}
 
 ## 💻 使用方法

@@ -4,7 +4,7 @@
     "url": "https://github.com/CSU-KangHu/HiTE",
     "description": "High-precision TE Annotator",
     "language": "Python",
-    "stars": 126,
+    "stars": 127,
     "forks": 6,
     "license": "GNU General Public License v3.0"
   },
@@ -15,26 +15,53 @@
       "github_username": null
     }
   ],
-  "publications": [],
+  "publications": [
+    {
+      "title": "panHiTE: a comprehensive and accurate pipeline for TE detection in large-scale population genomes",
+      "authors": [],
+      "journal": null,
+      "year": 2025,
+      "doi": "10.1101/2025.02.15.638472",
+      "pmid": null
+    }
+  ],
   "functionality": {
-    "main_purpose": "生物信息学工具",
-    "key_features": [],
-    "input_formats": [],
-    "output_formats": [],
-    "dependencies": []
+    "main_purpose": "使用动态边界调整方法检测和注释基因组组装中的全长转座元件（TE）",
+    "key_features": [
+      "比其他工具检测到更多全长TE",
+      "支持大规模种群基因组分析",
+      "提供panHiTE流程用于群体基因组TE检测"
+    ],
+    "input_formats": [
+      "FASTA"
+    ],
+    "output_formats": [
+      "GFF"
+    ],
+    "dependencies": [
+      "Python",
+      "Conda",
+      "Docker",
+      "Singularity",
+      "Nextflow"
+    ]
   },
   "usage": {
-    "installation": "参考README",
-    "basic_usage": "参考README",
-    "examples": [],
+    "installation": "git clone https://github.com/CSU-KangHu/HiTE.git",
+    "basic_usage": "python main.py --genome ${genome} --thread ${thread} --out_dir ${output_dir}",
+    "examples": [
+      "python main.py --genome /home/hukang/HiTE/demo/genome.fa --thread 40 --out_dir /home/hukang/HiTE/demo/test/",
+      "singularity run -B /home/hukang:/home/hukang /home/hukang/HiTE.sif python /HiTE/main.py --genome /home/hukang/HiTE/demo/genome.fa --thread 40 --out_dir /home/hukang/HiTE/demo/test/",
+      "docker run -v /home/hukang:/home/hukang kanghu/hite:3.3.3 python main.py --genome /home/hukang/HiTE/demo/genome.fa --thread 40 --out_dir /home/hukang/HiTE/demo/test/"
+    ],
     "parameters": []
   },
   "architecture": {
     "programming_languages": [
+      "Shell",
+      "R",
       "Perl",
       "Python",
-      "R",
-      "Shell",
       "C++"
     ],
     "frameworks": [],
@@ -101,14 +128,14 @@
       ".idea": "普通目录"
     },
     "main_components": [
-      "Docker容器",
-      "classification",
       "demo",
+      "classification",
       "library",
-      "module",
+      "Docker容器",
       "bin",
       "tools",
-      "RNA_seq"
+      "RNA_seq",
+      "module"
     ],
     "entry_points": [
       "主程序文件: main.nf",
@@ -118,11 +145,76 @@
     "test_structure": {}
   },
   "code_quality": null,
-  "performance": null,
+  "performance": {
+    "time_complexity": "未明确提及，但使用多线程处理，支持大规模基因组分析",
+    "space_complexity": "推荐硬件：40个CPU核心，128GB内存",
+    "parallelization": "多线程并行处理 支持容器化部署（Docker/Singularity） 支持Nextflow进行工作流管理",
+    "resource_usage": "推荐硬件：40个CPU核心，128GB内存",
+    "optimization_suggestions": []
+  },
   "bioinformatics_expertise": null,
   "usability": null,
-  "deployment": null,
-  "testing": null,
-  "data_requirements": null,
-  "analysis_timestamp": "2025-09-07T16:09:13.710747"
+  "deployment": {
+    "installation_methods": [
+      "conda",
+      "docker",
+      "singularity",
+      "nextflow"
+    ],
+    "system_requirements": [
+      "Ubuntu 16.04",
+      "CentOS 7",
+      "Python 3"
+    ],
+    "container_support": [
+      "Docker",
+      "Singularity"
+    ],
+    "cloud_deployment": [
+      "支持在云平台、HPC和本地集群运行"
+    ],
+    "configuration_files": [
+      "environment.yml",
+      "configure.py"
+    ]
+  },
+  "testing": {
+    "test_commands": [],
+    "test_data_sources": [
+      "https://github.com/CSU-KangHu/HiTE/wiki/panHiTE-tutorial"
+    ],
+    "example_datasets": [
+      "genome.fa"
+    ],
+    "validation_methods": [
+      "与现有工具进行性能比较"
+    ],
+    "benchmark_datasets": []
+  },
+  "data_requirements": {
+    "required_inputs": [
+      "基因组序列"
+    ],
+    "optional_inputs": [],
+    "data_formats": [
+      "FASTA"
+    ],
+    "file_size_limits": "未明确提及",
+    "preprocessing_steps": []
+  },
+  "security": {
+    "scan_timestamp": "2025-09-10T12:13:37.685236",
+    "vulnerabilities": [],
+    "total_high_risk": 0,
+    "total_medium_risk": 0,
+    "total_low_risk": 0,
+    "scan_tools_used": [
+      "bandit"
+    ],
+    "recommendations": [
+      "未发现明显的安全问题，建议定期进行安全检查"
+    ],
+    "scan_success": true
+  },
+  "analysis_timestamp": "2025-09-10T12:13:09.646732"
 }

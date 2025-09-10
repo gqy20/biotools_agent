@@ -9,7 +9,7 @@
 | **名称** | HiTE |
 | **地址** | [https://github.com/CSU-KangHu/HiTE](https://github.com/CSU-KangHu/HiTE) |
 | **语言** | Python |
-| **Stars** | 126 |
+| **Stars** | 127 |
 | **Forks** | 6 |
 | **许可证** | GNU General Public License v3.0 |
 
@@ -22,24 +22,48 @@
 ## 📚 相关发表文章
 
 
-暂无相关发表文章信息。
+
+### panHiTE: a comprehensive and accurate pipeline for TE detection in large-scale population genomes
+
+- **作者**: 
+
+- **年份**: 2025
+- **DOI**: [10.1101/2025.02.15.638472](https://doi.org/10.1101/2025.02.15.638472)
+
+
 
 
 ## 🔧 功能特性
 
 ### 主要用途
-生物信息学工具
+使用动态边界调整方法检测和注释基因组组装中的全长转座元件（TE）
 
 ### 核心功能
+
+- 比其他工具检测到更多全长TE
+
+- 支持大规模种群基因组分析
+
+- 提供panHiTE流程用于群体基因组TE检测
 
 
 ### 支持格式
 
-**输入格式**: 
+**输入格式**: `FASTA`
 
-**输出格式**: 
+**输出格式**: `GFF`
 
 ### 主要依赖
+
+- `Python`
+
+- `Conda`
+
+- `Docker`
+
+- `Singularity`
+
+- `Nextflow`
 
 
 ## 🏗️ 项目架构
@@ -47,13 +71,13 @@
 
 ### 编程语言
 
-- `Perl`
-
-- `Python`
+- `Shell`
 
 - `R`
 
-- `Shell`
+- `Perl`
+
+- `Python`
 
 - `C++`
 
@@ -199,6 +223,16 @@
 ## ⚡ 性能特征
 
 
+### 性能指标
+
+- **时间复杂度**: 未明确提及，但使用多线程处理，支持大规模基因组分析
+- **空间复杂度**: 推荐硬件：40个CPU核心，128GB内存
+- **并行化支持**: 多线程并行处理 支持容器化部署（Docker/Singularity） 支持Nextflow进行工作流管理
+- **资源使用**: 推荐硬件：40个CPU核心，128GB内存
+
+### 优化建议
+
+
 
 ## 🧬 生物信息学专业性
 
@@ -208,16 +242,57 @@
 
 
 
+## 🔒 安全风险分析
+
+
+### 安全风险概览
+
+| 风险级别 | 数量 |
+|----------|------|
+| **高风险** | 0 |
+| **中风险** | 0 |
+| **低风险** | 0 |
+
+**扫描工具**: `bandit`
+
+
+
+
+### 安全建议
+
+
+- 未发现明显的安全问题，建议定期进行安全检查
+
+
+
+*扫描时间: 2025-09-10T12:13:37.685236*
+
+
 ## 💻 使用方法
 
 ### 安装方法
 ```bash
-参考README
+git clone https://github.com/CSU-KangHu/HiTE.git
 ```
 
 ### 基本用法
 ```bash
-参考README
+python main.py --genome ${genome} --thread ${thread} --out_dir ${output_dir}
+```
+
+
+### 使用示例
+
+```bash
+python main.py --genome /home/hukang/HiTE/demo/genome.fa --thread 40 --out_dir /home/hukang/HiTE/demo/test/
+```
+
+```bash
+singularity run -B /home/hukang:/home/hukang /home/hukang/HiTE.sif python /HiTE/main.py --genome /home/hukang/HiTE/demo/genome.fa --thread 40 --out_dir /home/hukang/HiTE/demo/test/
+```
+
+```bash
+docker run -v /home/hukang:/home/hukang kanghu/hite:3.3.3 python main.py --genome /home/hukang/HiTE/demo/genome.fa --thread 40 --out_dir /home/hukang/HiTE/demo/test/
 ```
 
 
@@ -226,6 +301,6 @@
 
 ---
 
-*分析时间: 2025-09-07T16:09:13.710747*  
+*分析时间: 2025-09-10T12:13:09.646732*  
 *报告由 BioTools Agent 自动生成*
         

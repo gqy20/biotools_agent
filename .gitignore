@@ -10,6 +10,7 @@ bio/
 # 文档文件（特定的）
 QWEN.md
 GEMINI.md
+CLAUDE.md
 
 # Python缓存文件 (重要：这些不应该被追踪)
 src/__pycache__/

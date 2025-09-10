@@ -114,11 +114,22 @@ def analyze(
             )
             # 将架构信息和其他AI分析结果添加到分析结果中
             analysis_result.architecture = architecture
-            analysis = analysis_result
             progress.update(task6, completed=1)
 
-            # 7. 生成报告
-            task7 = progress.add_task("生成可视化报告...", total=None)
+            # 7. 安全分析 (MVP新增功能)
+            task7 = progress.add_task("安全风险分析...", total=None)
+            security_analysis = github_analyzer.analyze_security(repo_path)
+            if security_analysis:
+                analysis_result.security = security_analysis
+                print(f"🔒 安全分析完成: {security_analysis.total_high_risk + security_analysis.total_medium_risk + security_analysis.total_low_risk} 个安全问题")
+            else:
+                print("⚠️ 安全分析跳过或失败")
+            progress.update(task7, completed=1)
+            
+            analysis = analysis_result
+
+            # 8. 生成报告
+            task8 = progress.add_task("生成可视化报告...", total=None)
             reports = {}
 
             if "html" in output_formats:
@@ -128,7 +139,7 @@ def analyze(
             if "json" in output_formats:
                 reports["json"] = visualizer.generate_json_report(analysis)
 
-            progress.update(task7, completed=1)
+            progress.update(task8, completed=1)
 
         # 显示结果摘要
         _display_analysis_summary(analysis, reports)

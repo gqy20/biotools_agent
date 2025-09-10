@@ -9,7 +9,7 @@ import requests
 from git import Repo
 
 from .config import config_manager
-from .models import AuthorInfo, ProjectArchitecture, RepositoryInfo
+from .models import AuthorInfo, ProjectArchitecture, RepositoryInfo, SecurityAnalysis
 
 
 class GitHubAnalyzer:
@@ -676,3 +676,29 @@ class GitHubAnalyzer:
                 test_structure[item.name] = "根目录测试文件"
 
         return test_structure
+
+    def analyze_security(self, repo_path: Path) -> Optional[SecurityAnalysis]:
+        """分析仓库安全性 - MVP实现"""
+        print(f"🔍 开始安全分析: {repo_path.name}")
+        
+        try:
+            from .security_analyzer import SecurityAnalyzer
+            
+            analyzer = SecurityAnalyzer(repo_path)
+            security_analysis = analyzer.analyze_security()
+            
+            if security_analysis:
+                print(f"✅ 安全分析完成: {security_analysis.total_high_risk} 高风险, "
+                      f"{security_analysis.total_medium_risk} 中风险, "
+                      f"{security_analysis.total_low_risk} 低风险")
+            else:
+                print("⚠️ 安全分析未返回结果")
+                
+            return security_analysis
+            
+        except ImportError:
+            print("⚠️ 安全分析模块导入失败，跳过安全检查")
+            return None
+        except Exception as e:
+            print(f"⚠️ 安全分析失败: {e}")
+            return None
