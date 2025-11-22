@@ -8,8 +8,27 @@ from dotenv import load_dotenv
 from pydantic import BaseModel, Field
 
 
-class AppConfig(BaseModel):
-    """应用配置模型"""
+class ClaudeSDKConfig(BaseModel):
+    """Claude Code SDK 配置模型"""
+
+    # Claude API配置
+    claude_api_key: Optional[str] = Field(default=None, description="Claude API密钥")
+    claude_base_url: str = Field(
+        default="https://api.anthropic.com", description="Claude API基础URL"
+    )
+    claude_model: str = Field(default="claude-3-5-sonnet-20241022", description="使用的Claude模型")
+    max_turns: int = Field(default=10, description="最大对话轮数")
+    timeout: int = Field(default=180, description="超时时间(秒)")
+    enable_cache: bool = Field(default=True, description="启用缓存")
+    permission_mode: str = Field(default="acceptEdits", description="权限模式")
+
+    # 代理配置
+    use_file_agents: bool = Field(default=True, description="使用文件系统代理")
+    fallback_to_programmatic: bool = Field(default=True, description="回退到程序化代理")
+
+
+class LegacyAIConfig(BaseModel):
+    """传统AI配置模型（向后兼容）"""
 
     # OpenAI/模型配置
     openai_api_key: Optional[str] = Field(default=None, description="OpenAI API密钥")
@@ -17,6 +36,16 @@ class AppConfig(BaseModel):
         default="https://api.openai.com/v1", description="OpenAI API基础URL"
     )
     openai_model: str = Field(default="gpt-3.5-turbo", description="使用的模型名称")
+
+
+class AppConfig(BaseModel):
+    """应用配置模型"""
+
+    # Claude SDK配置（推荐）
+    claude_sdk: ClaudeSDKConfig = Field(default_factory=ClaudeSDKConfig)
+
+    # 传统AI配置（向后兼容）
+    legacy_ai: LegacyAIConfig = Field(default_factory=LegacyAIConfig)
 
     # GitHub配置
     hub_token: Optional[str] = Field(default=None, description="GitHub访问令牌")
@@ -64,11 +93,26 @@ class ConfigManager:
 
         # 2. 从环境变量创建配置
         config_data = {
-            "openai_api_key": os.getenv("OPENAI_API_KEY"),
-            "openai_base_url": os.getenv(
-                "OPENAI_BASE_URL", "https://api.openai.com/v1"
-            ),
-            "openai_model": os.getenv("OPENAI_MODEL", "gpt-3.5-turbo"),
+            "claude_sdk": {
+                "claude_api_key": os.getenv("CLAUDE_API_KEY"),
+                "claude_base_url": os.getenv(
+                    "CLAUDE_BASE_URL", "https://api.anthropic.com"
+                ),
+                "claude_model": os.getenv("CLAUDE_MODEL", "claude-3-5-sonnet-20241022"),
+                "max_turns": int(os.getenv("CLAUDE_MAX_TURNS", "10")),
+                "timeout": int(os.getenv("CLAUDE_TIMEOUT", "180")),
+                "enable_cache": os.getenv("CLAUDE_ENABLE_CACHE", "true").lower() == "true",
+                "permission_mode": os.getenv("CLAUDE_PERMISSION_MODE", "acceptEdits"),
+                "use_file_agents": os.getenv("USE_FILE_AGENTS", "true").lower() == "true",
+                "fallback_to_programmatic": os.getenv("FALLBACK_TO_PROGRAMMATIC", "true").lower() == "true",
+            },
+            "legacy_ai": {
+                "openai_api_key": os.getenv("OPENAI_API_KEY"),
+                "openai_base_url": os.getenv(
+                    "OPENAI_BASE_URL", "https://api.openai.com/v1"
+                ),
+                "openai_model": os.getenv("OPENAI_MODEL", "gpt-3.5-turbo"),
+            },
             "hub_token": os.getenv("HUB_TOKEN"),
             "supabase_url": os.getenv("SUPABASE_URL"),
             "supabase_key": os.getenv("SUPABASE_SERVICE_ROLE_KEY"),  # 使用服务角色密钥
@@ -108,8 +152,13 @@ class ConfigManager:
         """验证配置是否完整"""
         errors = []
 
-        if not self.config.openai_api_key:
-            errors.append("缺少OPENAI_API_KEY配置")
+        # 检查Claude SDK配置（推荐）
+        if not self.config.claude_sdk.claude_api_key:
+            errors.append("缺少CLAUDE_API_KEY配置（推荐使用代理模式）")
+
+        # 如果没有Claude配置，检查传统AI配置
+        if not self.config.claude_sdk.claude_api_key and not self.config.legacy_ai.openai_api_key:
+            errors.append("缺少AI配置：请设置CLAUDE_API_KEY或OPENAI_API_KEY")
 
         return len(errors) == 0, errors
 

@@ -8,7 +8,7 @@ from rich.panel import Panel
 from rich.progress import Progress, SpinnerColumn, TextColumn
 from rich.table import Table
 
-from .ai_analyzer import AIAnalyzer
+from .ai_analyzer_adapter import AIAnalyzer
 from .config import ConfigManager, config_manager
 from .github_analyzer import GitHubAnalyzer
 from .supabase_client import supabase_manager
@@ -192,13 +192,23 @@ def config(
     config_table.add_column("值", style="green")
     config_table.add_column("状态", style="yellow")
 
+    # Claude SDK配置（推荐）
+    config_table.add_row(
+        "CLAUDE_API_KEY",
+        "***已设置***" if current_config.config.claude_sdk.claude_api_key else "未设置",
+        "✅" if current_config.config.claude_sdk.claude_api_key else "❌",
+    )
+    config_table.add_row("CLAUDE_BASE_URL", current_config.config.claude_sdk.claude_base_url, "✅")
+    config_table.add_row("CLAUDE_MODEL", current_config.config.claude_sdk.claude_model, "✅")
+
+    # 传统AI配置（向后兼容）
     config_table.add_row(
         "OPENAI_API_KEY",
-        "***已设置***" if current_config.config.openai_api_key else "未设置",
-        "✅" if current_config.config.openai_api_key else "❌",
+        "***已设置***" if current_config.config.legacy_ai.openai_api_key else "未设置",
+        "⚠️" if current_config.config.legacy_ai.openai_api_key else "⚪",
     )
-    config_table.add_row("OPENAI_BASE_URL", current_config.config.openai_base_url, "✅")
-    config_table.add_row("OPENAI_MODEL", current_config.config.openai_model, "✅")
+    config_table.add_row("OPENAI_BASE_URL", current_config.config.legacy_ai.openai_base_url, "⚪")
+    config_table.add_row("OPENAI_MODEL", current_config.config.legacy_ai.openai_model, "⚪")
     config_table.add_row(
         "HUB_TOKEN",
         "***已设置***" if current_config.config.hub_token else "未设置",
