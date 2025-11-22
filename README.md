@@ -49,6 +49,9 @@ biotools-agent analyze https://github.com/username/biotools-repo --no-save-to-db
 
 # 使用自定义配置文件
 biotools-agent analyze https://github.com/username/biotools-repo --env-file custom.env
+
+# 检查配置
+biotools-agent config
 ```
 
 ## 🎯 分析结果
@@ -57,10 +60,10 @@ biotools-agent analyze https://github.com/username/biotools-repo --env-file cust
 
 ### 📋 基础信息
 - **项目概览**: 名称、描述、语言、Stars/Forks统计
-- **作者信息**: 自动提取贡献者信息 
+- **作者信息**: 自动提取贡献者信息
 - **相关论文**: 识别相关发表文章
 
-### 🔧 功能分析  
+### 🔧 功能分析
 - **主要用途**: 一句话概括工具功能（强制中文输出）
 - **核心特性**: 详细功能列表
 - **输入输出格式**: 支持的数据格式
@@ -77,7 +80,7 @@ biotools-agent analyze https://github.com/username/biotools-repo --env-file cust
 - **并行化支持**: 多核利用能力
 - **性能优化**: 改进建议
 
-### 🚀 部署信息 
+### 🚀 部署信息
 - **安装方法**: 多种安装方式
 - **系统要求**: 操作系统和依赖需求
 - **容器支持**: Docker/Singularity等
@@ -91,7 +94,7 @@ biotools-agent analyze https://github.com/username/biotools-repo --env-file cust
 
 ### 📊 数据需求
 - **必需输入**: 运行所需的数据格式
-- **可选输入**: 增强功能的额外数据  
+- **可选输入**: 增强功能的额外数据
 - **预处理步骤**: 数据准备流程
 - **文件大小限制**: 处理能力范围
 
@@ -101,11 +104,6 @@ biotools-agent analyze https://github.com/username/biotools-repo --env-file cust
 - **🔍 代码级分析**: 深入分析核心算法和实现细节
 - **📚 全面文档**: 自动生成HTML、Markdown、JSON多种格式报告
 - **🎯 准确识别**: 智能区分生物信息学专业工具vs通用软件
-biotools-agent analyze https://github.com/username/repo --env-file custom.env
-
-# 检查配置
-biotools-agent config
-```
 
 ## 配置说明
 
